@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shaker.data.core", "..\shak
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shaker.data.entity", "..\shaker.data.entity\shaker.data.entity.csproj", "{52D0D42A-9C75-470F-BCD4-57D909768B37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shaker.data", "..\..\shaker.data\shaker.data.csproj", "{D0CE299D-26EA-48F0-AA29-0184EC8D05F9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shaker.data", "..\shaker.data\shaker.data.csproj", "{D0CE299D-26EA-48F0-AA29-0184EC8D05F9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shaker.domain.dto", "..\shaker.domain.dto\shaker.domain.dto.csproj", "{6054938B-DC87-4E1F-A142-D3040B64E3BF}"
 EndProject
