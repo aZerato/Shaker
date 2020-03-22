@@ -353,3 +353,4 @@ MigrationBackup/
 .ionide/
 
 ./shaker/bd.json
+.DS_Store
