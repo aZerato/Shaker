@@ -1,0 +1,117 @@
+﻿<div class="row"
+     data-module="chat">
+
+        <textarea>
+        </textarea>
+
+        <button data-action="send">
+            Send
+        </button>
+
+        <div id="log"></div>
+</div>
+
+@section scripts {
+
+    <script>
+        let Wstester = function (url) {
+            this.serverUrl = url;
+            this.ws = new WebSocket(this.serverUrl);
+            this.$main = $('[data-module="chat"]');
+        };
+
+        Wstester.prototype.initializer = function () {
+            this.webSocketInitializer();
+        };
+
+        Wstester.prototype.webSocketInitializer = function () {
+            let self = this;
+
+            self.$btnSend = self.$main.find('[data-action="send"]');
+            self.$textarea = self.$main.find("textarea");
+            self.$logElement = self.$main.find("#log");
+
+            self.ws.onopen = function (event) {
+                self.appendInfo("WS open");
+
+                console.log("WS open");
+            };
+
+            self.ws.onclose = function (event) {
+                self.appendInfo("WS close");
+
+                console.log("WS close");
+            };
+
+            self.ws.onmessage = function (event) {
+                let msg = $.parseJSON(event.data.replace(/\\"/g, '"'));
+
+                self.appendMessage(msg);
+
+                console.log(event.data);
+            };
+
+            self.ws.onerror = function (event) {
+                self.appendInfo(event.data);
+
+                console.error(event.data);
+            };
+
+            self.sendMessageBinding();
+        };
+
+        Wstester.prototype.sendMessageBinding = function () {
+            let self = this;
+
+            self.$btnSend.click(function () {
+                let msg = new Message(self.$textarea.val());
+
+                self.$textarea.val('');
+
+                let msgStr = JSON.stringify(msg);
+
+                self.ws.send(msgStr);
+            });
+        };
+
+
+        Wstester.prototype.appendMessage = function (message) {
+            let self = this;
+
+            self.$logElement.append('<p>[' + message.date + '][' + message.username + ']' + message.text + '</p>');
+        };
+
+        Wstester.prototype.appendInfo = function (info) {
+            let self = this;
+
+            self.$logElement.append('<p>' + info + '</p>');
+        };
+
+        let Message = function (msg) {
+            this.text = JSON.encodeString(msg);
+            // type
+            // date
+            // username
+        };
+
+        JSON.encodeString = function (str) {
+            return String(str)
+                .replace(/\\n/g, "\\n")
+                .replace(/\\'/g, "\\'")
+                .replace(/\\"/g, '\\"')
+                .replace(/\\&/g, "\\&")
+                .replace(/\\r/g, "\\r")
+                .replace(/\\t/g, "\\t")
+                .replace(/\\b/g, "\\b")
+                .replace(/\\f/g, "\\f");
+        };
+
+        $(function () {
+            let serverUrlWs = 'wss://localhost:5001/ws/chat';
+
+            let wsT = new Wstester(serverUrlWs);
+            wsT.initializer();
+        });
+    </script>
+
+}

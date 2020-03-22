@@ -1,16 +1,13 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using shaker.data.core;
-using shaker.data.entity;
-using shaker.data.Json;
-using shaker.domain.Posts;
 
 namespace shaker
 {
-    public class Startup
+    public partial class Startup
     {
         public Startup(IConfiguration configuration)
         {
@@ -24,13 +21,11 @@ namespace shaker
         {
             services.AddControllersWithViews();
 
-            services.AddTransient<IUnitOfWork>(s => new JsonUnitOfWork(@"bd.json"));
-            services.AddTransient<IRepository<Post>, Repository<Post>>();
-            services.AddTransient<IPostsDomain, PostsDomain>();
+            ConfigureServicesIoC(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services)
         {
             if (env.IsDevelopment())
             {
@@ -42,6 +37,7 @@ namespace shaker
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -55,6 +51,8 @@ namespace shaker
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            ConfigureWebSocket(app, env, services);
         }
     }
 }
