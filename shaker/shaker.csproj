@@ -4,8 +4,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-
-
   <ItemGroup>
     <ProjectReference Include="..\shaker.domain.dto\shaker.domain.dto.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
@@ -26,5 +24,8 @@
   <ItemGroup>
     <Folder Include="Models\Posts\" />
     <Folder Include="Views\Blog\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="bd.json" />
   </ItemGroup>
 </Project>

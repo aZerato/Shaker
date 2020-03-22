@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using shaker.domain.Posts;
 using shaker.domain.dto;
 using shaker.Models.Posts;
+using System;
 
 namespace shaker.Controllers
 {
@@ -23,13 +24,23 @@ namespace shaker.Controllers
 
         public IActionResult Index()
         {
-            IList<PostListModel> list = _postsDomain.GetAll().Select(s => new PostListModel
+            IList<PostListModel> list = new List<PostListModel>();
+
+            try
             {
-                Id = s.Id,
-                Content = s.Content,
-                Description = s.Description,
-                Creation = s.Creation
-            }).ToList();
+                list = _postsDomain.GetAll().Select(s => new PostListModel
+                {
+                    Id = s.Id,
+                    Content = s.Content,
+                    Description = s.Description,
+                    Creation = s.Creation
+                }).ToList();
+            }
+            catch(Exception ex)
+            {
+                ViewBag.Error = ex.Message;
+                _logger.LogError(ex.Message);
+            }
 
             return View(list);
         }
@@ -42,20 +53,40 @@ namespace shaker.Controllers
         [HttpPost]
         public IActionResult Create(PostCreateModel post)
         {
-            _postsDomain.Create(new PostDto
+            try
             {
-                Content = post.Content,
-                Description = post.Description
-            });
+                _postsDomain.Create(new PostDto
+                {
+                    Content = post.Content,
+                    Description = post.Description
+                });
 
-            return new RedirectToActionResult("Index", "Blog", null);
+                return new RedirectToActionResult("Index", "Blog", null);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = ex.Message;
+                _logger.LogError(ex.Message);
+            }
+
+            return View();
         }
 
         public IActionResult Delete(int id)
         {
-            _postsDomain.Delete(id);
+            try
+            {
+                _postsDomain.Delete(id);
 
-            return new RedirectToActionResult("Index", "Blog", null);
+                return new RedirectToActionResult("Index", "Blog", null);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = ex.Message;
+                _logger.LogError(ex.Message);
+            }
+
+            return View();
         }
     }
 }
