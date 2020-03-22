@@ -1,0 +1,28 @@
+﻿@model IList<shaker.Models.Posts.PostListModel>
+
+<div class="row">
+
+    <div class="col-12 mb-1">
+        <a href="@Url.Action("Create", "Blog")"
+           class="btn btn-primary">
+            Create
+        </a>
+    </div>
+
+    @foreach (var item in Model)
+    {
+        <div class="col-12">
+            <div class="jumbotron">
+
+                @item.Description
+                @item.Content
+                @item.Creation
+
+                <a href="@Url.Action("Delete", "Blog", new { id = item.Id })"
+                   class="btn btn-danger">
+                    Delete
+                </a>
+            </div>
+        </div>
+    }
+</div>

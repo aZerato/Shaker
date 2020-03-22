@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\shaker.data.core\shaker.data.core.csproj" />
+    <ProjectReference Include="..\shaker.data.entity\shaker.data.entity.csproj" />
+    <ProjectReference Include="..\..\shaker.data\shaker.data.csproj" />
+    <ProjectReference Include="..\shaker.domain.dto\shaker.domain.dto.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Posts\" />
+  </ItemGroup>
+</Project>

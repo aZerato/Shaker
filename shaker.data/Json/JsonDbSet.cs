@@ -1,0 +1,64 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using LiteDB;
+using shaker.data.core;
+
+namespace shaker.data.Json
+{
+    public class JsonDbSet<TEntity> : IDbSet<TEntity>
+        where TEntity : IBaseEntity
+    {
+        private ILiteDatabase _liteDatabase;
+        private ILiteCollection<TEntity> _collection;
+
+        public JsonDbSet(ILiteDatabase liteDatabase)
+        {
+            _liteDatabase = liteDatabase;
+            _collection = _liteDatabase.GetCollection<TEntity>(nameof(TEntity));
+        }
+
+        public int Add(TEntity entity)
+        {
+            return _collection.Insert(entity);
+        }
+
+        public void Attach(TEntity entity)
+        {
+            _collection.Query().ForUpdate();
+        }
+
+        public void Remove(TEntity entity)
+        {
+            _collection.Delete(entity.Id);
+        }
+
+        public TEntity Find(int id)
+        {
+            return _collection.FindById(id);
+        }
+
+        public IEnumerable<TEntity> AsEnumerable()
+        {
+            return _collection.Query().ToEnumerable();
+        }
+
+        public IEnumerable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selectBuilder)
+            where TResult : IBaseEntity
+        {
+            return _collection.Query().Select(selectBuilder).ToEnumerable();
+        }
+
+        public IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
+        {
+            return _collection.Query().Where(predicate).ToEnumerable();
+        }
+
+        public IEnumerable<TResult> Where<TResult>(Expression<Func<TEntity, TResult>> selectBuilder,
+            Expression<Func<TEntity, bool>> predicate)
+            where TResult : IBaseEntity
+        {
+            return _collection.Query().Where(predicate).Select(selectBuilder).ToEnumerable();
+        }
+    }
+}
