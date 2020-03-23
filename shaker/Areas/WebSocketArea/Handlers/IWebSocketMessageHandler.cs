@@ -12,8 +12,8 @@ namespace shaker.Areas.WebSocketArea.Handlers
 
         Task HandleMessage(WebSocketReceiveResult result, byte[] buffer, WebSocketMessage webSocketMessage);
 
-        Task BroadcastOthers(byte[] buffer, WebSocketMessage webSocketMessage);
+        Task BroadcastOthers(string msg, byte[] buffer, WebSocketMessage webSocketMessage);
 
-        Task BroadcastAll(byte[] buffer, WebSocketMessage webSocketMessage);
+        Task BroadcastAll(string msg, byte[] buffer, WebSocketMessage webSocketMessage);
     }
 }

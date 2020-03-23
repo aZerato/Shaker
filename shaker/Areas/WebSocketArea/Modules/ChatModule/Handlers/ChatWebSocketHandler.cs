@@ -23,26 +23,26 @@ namespace shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers
             Path = path;
         }
 
-        public async Task BroadcastAll(byte[] buffer, WebSocketMessage webSocketMessage)
+        public async Task BroadcastAll(string msg, byte[] buffer, WebSocketMessage webSocketMessage)
         {
             var all = _wsRepository.GetAll();
 
             foreach (var uws in all)
             {
-                await uws.Ws.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length),
+                await uws.Ws.SendAsync(new ArraySegment<byte>(buffer, 0, msg.Length),
                     WebSocketMessageType.Text,
                     true,
                     CancellationToken.None);
             }
         }
 
-        public async Task BroadcastOthers(byte[] buffer, WebSocketMessage webSocketMessage)
+        public async Task BroadcastOthers(string msg, byte[] buffer, WebSocketMessage webSocketMessage)
         {
             var others = _wsRepository.GetAllOthers(webSocketMessage);
 
             foreach (var uws in others)
             {
-                await uws.Ws.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), 
+                await uws.Ws.SendAsync(new ArraySegment<byte>(buffer, 0, msg.Length), 
                     WebSocketMessageType.Text, 
                     true, 
                     CancellationToken.None);
@@ -51,15 +51,16 @@ namespace shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers
 
         public async Task HandleMessage(WebSocketReceiveResult result, byte[] buffer, WebSocketMessage webSocketMessage)
         {
-            string msg = Encoding.UTF8.GetString(buffer);
-
             try
             {
+                string msg = Encoding.ASCII.GetString(buffer);
                 ChatWsMessage message = JsonConvert.DeserializeObject<ChatWsMessage>(msg);
+                string serialisedMessage = JsonConvert.SerializeObject(message);
+                byte[] bufferUpadted = Encoding.ASCII.GetBytes(serialisedMessage);
 
                 if (message.Type == ChatWsMessageType.Message)
                 {
-                    await BroadcastOthers(buffer, webSocketMessage);
+                    await BroadcastOthers(serialisedMessage, bufferUpadted, webSocketMessage);
                 }
             }
             catch (Exception)
@@ -82,12 +83,15 @@ namespace shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers
                 Username = "system"
             };
 
-            string serialisedMessage = JsonConvert.SerializeObject(msg);
-            serialisedMessage = serialisedMessage.Replace(@"""", @"\""");
+            string serialisedMessage = JsonConvert.SerializeObject(msg, Formatting.Indented);
 
-            byte[] bytes = Encoding.UTF8.GetBytes(serialisedMessage);
+            byte[] bytes = Encoding.ASCII.GetBytes(serialisedMessage);
 
-            await webSocket.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+            await webSocket.SendAsync(
+                new ArraySegment<byte>(bytes, 0, serialisedMessage.Length),
+                WebSocketMessageType.Text,
+                true,
+                CancellationToken.None);
         }
     }
 }

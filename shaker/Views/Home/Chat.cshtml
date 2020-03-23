@@ -1,6 +1,5 @@
 ﻿<div class="row"
      data-module="chat">
-
         <textarea>
         </textarea>
 
@@ -44,7 +43,7 @@
             };
 
             self.ws.onmessage = function (event) {
-                let msg = $.parseJSON(event.data.replace(/\\"/g, '"'));
+                let msg = $.parseJSON(msg);
 
                 self.appendMessage(msg);
 
@@ -89,6 +88,7 @@
 
         let Message = function (msg) {
             this.text = JSON.encodeString(msg);
+            this.username = navigator.appName;
             // type
             // date
             // username
