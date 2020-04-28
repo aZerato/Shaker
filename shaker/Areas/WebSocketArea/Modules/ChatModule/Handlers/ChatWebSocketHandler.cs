@@ -60,7 +60,8 @@ namespace shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers
 
                 if (message.Type == ChatWsMessageType.Message)
                 {
-                    await BroadcastOthers(serialisedMessage, bufferUpadted, webSocketMessage);
+                    //await BroadcastOthers(serialisedMessage, bufferUpadted, webSocketMessage);
+                    await BroadcastAll(serialisedMessage, bufferUpadted, webSocketMessage);
                 }
             }
             catch (Exception)
