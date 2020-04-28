@@ -43,11 +43,11 @@
             };
 
             self.ws.onmessage = function (event) {
-                let msg = $.parseJSON(msg);
+                let msg = $.parseJSON(event.data);
 
                 self.appendMessage(msg);
 
-                console.log(event.data);
+                console.log(msg);
             };
 
             self.ws.onerror = function (event) {
