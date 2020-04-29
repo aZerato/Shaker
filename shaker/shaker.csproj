@@ -24,6 +24,8 @@
   <ItemGroup>
     <Folder Include="Models\Posts\" />
     <Folder Include="Views\Blog\" />
+    <Folder Include="Areas\ChannelsArea\" />
+    <Folder Include="Areas\ChannelsArea\Controllers\" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="bd.json" />
