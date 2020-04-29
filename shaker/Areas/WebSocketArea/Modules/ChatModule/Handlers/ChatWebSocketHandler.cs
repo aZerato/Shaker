@@ -77,6 +77,15 @@ namespace shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers
         public async Task SendInitialMessages(WebSocketMessage webSocketMessage)
         {
             WebSocket webSocket = webSocketMessage.Ws;
+
+
+            await WelcomeMessage(webSocket);
+
+            await UserConnectedMessageToOthers(webSocketMessage);
+        }
+
+        private async Task WelcomeMessage(WebSocket webSocket)
+        {
             ChatWsMessage msg = new ChatWsMessage
             {
                 Type = ChatWsMessageType.System,
@@ -93,6 +102,30 @@ namespace shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers
                 WebSocketMessageType.Text,
                 true,
                 CancellationToken.None);
+        }
+
+        private async Task UserConnectedMessageToOthers(WebSocketMessage webSocketMessage)
+        {
+            ChatWsMessage msg = new ChatWsMessage
+            {
+                Type = ChatWsMessageType.System,
+                Text = "Welcome to a new user",
+                Username = "system"
+            };
+
+            string serialisedMessage = JsonConvert.SerializeObject(msg, Formatting.Indented);
+
+            byte[] bytes = Encoding.ASCII.GetBytes(serialisedMessage);
+
+            var others = _wsRepository.GetAllOthers(webSocketMessage);
+
+            foreach (var uws in others)
+            {
+                await uws.Ws.SendAsync(new ArraySegment<byte>(bytes, 0, serialisedMessage.Length),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None);
+            }
         }
     }
 }
