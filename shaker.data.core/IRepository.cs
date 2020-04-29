@@ -20,7 +20,7 @@ namespace shaker.data.core
         /// Remove an entity to context.
         /// </summary>
         /// <param name="entity">The entity object.</param>
-        void Remove(TEntity entity);
+        bool Remove(TEntity entity);
 
         /// <summary>
         /// Update an entity to context.

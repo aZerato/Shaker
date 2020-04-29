@@ -2,7 +2,7 @@
 
 namespace shaker.domain.dto
 {
-    public class PostDto
+    public class PostDto : IBaseDto
     {
         public int Id { get; set; }
 

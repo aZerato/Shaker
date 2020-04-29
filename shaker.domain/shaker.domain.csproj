@@ -12,5 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Posts\" />
+    <Folder Include="Channels\" />
   </ItemGroup>
 </Project>

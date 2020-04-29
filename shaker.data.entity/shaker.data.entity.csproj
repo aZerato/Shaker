@@ -7,4 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\shaker.data.core\shaker.data.core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Channels\" />
+  </ItemGroup>
 </Project>
