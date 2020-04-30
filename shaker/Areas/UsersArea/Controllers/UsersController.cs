@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using shaker.domain.Users;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace shaker.Areas.UsersArea.Controllers
 {
     [Route("api/[controller]")]
@@ -23,46 +21,33 @@ namespace shaker.Areas.UsersArea.Controllers
             _logger = logger;
         }
 
-        // GET: api/values
         [HttpGet]
-        public async Task<IEnumerable<UserDto>> Get()
+        public IEnumerable<UserDto> Get()
         {
-            var u = new UserDto();
-            u.Email = "testemail";
-            u.Firstname = "testfirstname";
-            u.Name = "testname";
-            u.Password = "test";
-            var tsk = _usersDomain.GetAll();
-
-            await Task.WhenAll(_usersDomain.Create(u), tsk);
-
-            return await tsk;
+            return _usersDomain.GetAll();
         }
 
-        // GET api/values/5
         [HttpGet("{id}")]
-        public async Task<UserDto> Get(int id)
+        public UserDto Get(int id)
         {
-            return await _usersDomain.Get(id);
+            return _usersDomain.Get(id);
         }
 
-        // POST api/values
         [HttpPost]
-        public async Task<UserDto> Post([FromBody]UserDto dto)
+        public UserDto Post([FromBody]AuthDto dto)
         {
-            return await _usersDomain.Create(dto);
+            return _usersDomain.Create(dto);
         }
 
-        // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, [FromBody]UserDto value)
         {
         }
 
-        // DELETE api/values/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public bool Delete(int id)
         {
+            return _usersDomain.Delete(id);
         }
     }
 }

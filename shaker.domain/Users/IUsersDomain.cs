@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace shaker.domain.Users
 {
     public interface IUsersDomain
     {
-        Task<UserDto> Create(UserDto dto);
+        bool IsAuthenticated(AuthDto dto);
 
-        Task<bool> Delete(int id);
+        UserDto Create(AuthDto dto);
 
-        Task<UserDto> Get(int id);
+        bool Delete(int id);
 
-        Task<bool> UserExists(UserDto dto);
+        UserDto Get(int id);
 
-        Task<IEnumerable<UserDto>> GetAll();
+        IEnumerable<UserDto> GetAll();
     }
 }
