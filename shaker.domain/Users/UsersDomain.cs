@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using shaker.data.core;
 using shaker.data.entity.Users;
 
@@ -11,87 +11,71 @@ namespace shaker.domain.Users
     public class UsersDomain : IUsersDomain
     {
         private IRepository<User> _repository;
+        private readonly IPasswordHasher<AuthDto> _passwordHasher;
 
-        public UsersDomain(IRepository<User> repository)
+        public UsersDomain(
+            IRepository<User> repository,
+            IPasswordHasher<AuthDto> passwordHasher)
         {
             _repository = repository;
+            _passwordHasher = passwordHasher;
         }
 
-        public async Task<UserDto> Create(UserDto dto)
+        public UserDto IsAuthenticated(AuthDto dto)
         {
-            Task<User> getTask = Task.Run(() =>
-                _repository.GetAll(u => u.Email == dto.Email && u.Password == dto.Password).FirstOrDefault());
+            string hashedPwd = _passwordHasher.HashPassword(dto, dto.Password);
 
-            Task<int> addTask = getTask.ContinueWith((gtsk) =>
+            User user = _repository
+                .GetAll(u => u.UserName == dto.UserName && u.PasswordHash == hashedPwd)
+                .SingleOrDefault();
+
+            return ToUserDto(user);
+        }
+
+        public UserDto Create(AuthDto dto)
+        {
+            User userNameExists = _repository.GetAll(u => u.UserName == dto.UserName).FirstOrDefault();
+
+            if (userNameExists != null) return null;
+
+            string hashedPwd = _passwordHasher.HashPassword(dto, dto.Password);
+
+            User entity = new User()
             {
-                if (getTask.IsCompletedSuccessfully && getTask.Result == null)
-                {
-                    User entity = new User()
-                    {
-                        Firstname = dto.Firstname,
-                        Name = dto.Name,
-                        Password = dto.Password,
-                        Email = dto.Email,
-                        LastConnection = DateTime.UtcNow,
-                        Creation = DateTime.UtcNow
-                    };
-                    return _repository.Add(entity);
-                }
-                return 0;
-            });
-            
-            await Task.WhenAll(getTask, addTask);
+                UserName = dto.UserName,
+                PasswordHash = hashedPwd,
+                LastConnection = DateTime.UtcNow,
+                Creation = DateTime.UtcNow
+            };
 
-            dto.Id = addTask.IsCompletedSuccessfully ? addTask.Result : 0;
-
-            return dto;
-        }
-
-        public async Task<UserDto> Get(int id)
-        {
-            Task<UserDto> getTask = Task.Run(() => {
-                    User u = _repository.Get(id);
-                    return ToUserDto(u);
-                });
-
-            return await getTask;
-        }
-
-        public async Task<bool> UserExists(UserDto dto)
-        {
-            Task<bool> getTask = Task.Run(() => {
-                return _repository.GetAll(u => u.Email == dto.Email && u.Password == dto.Password).FirstOrDefault() != null;
-            });
-
-            return await getTask;
-        }
-
-        public async Task<bool> Delete(int id)
-        {
-            Task<User> getTask = Task.Run(() => _repository.Get(id));
-
-            Task<bool> removeTsk = getTask.ContinueWith(gTsk =>
+            UserDto userDto = new UserDto
             {
-                if (getTask.IsCompletedSuccessfully)
-                {
-                    return _repository.Remove(getTask.Result);
-                }
-                return false;
-            });
+                Id = _repository.Add(entity),
+                UserName = dto.UserName
+            };
 
-            return await removeTsk;
+            return userDto;
         }
 
-        public async Task<IEnumerable<UserDto>> GetAll()
+        public UserDto Get(int id)
         {
-            Task<IEnumerable<UserDto>> getAllTask =
-                Task.Run(() =>
-                {
-                    return  _repository.GetAll(
-                                ToUserDtoSb()); 
-                });
+            User user = _repository.Get(id);
 
-            return await getAllTask;
+            return ToUserDto(user);
+        }
+
+        public bool Delete(int id)
+        {
+            User user = _repository.Get(id);
+
+            if (user == null) return false;
+
+            return _repository.Remove(user);
+        }
+
+        public IEnumerable<UserDto> GetAll()
+        {
+            return _repository.GetAll(ToUserDtoSb()); 
         }
 
         private static Expression<Func<User, UserDto>> ToUserDtoSb()
@@ -99,11 +83,11 @@ namespace shaker.domain.Users
             return u => new UserDto
             {
                 Id = u.Id,
+                UserName = u.UserName,
                 Firstname = u.Firstname,
                 Name = u.Name,
                 Email = u.Email,
-                Creation = u.Creation,
-                LastConnection = u.LastConnection
+                Creation = u.Creation
             };
         }
 
@@ -113,11 +97,11 @@ namespace shaker.domain.Users
                 new UserDto
                 {
                     Id = u.Id,
+                    UserName = u.UserName,
                     Firstname = u.Firstname,
                     Name = u.Name,
                     Email = u.Email,
-                    Creation = u.Creation,
-                    LastConnection = u.LastConnection
+                    Creation = u.Creation
                 };
         }
     }

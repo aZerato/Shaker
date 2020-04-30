@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using shaker.data.core;
 using shaker.data.entity.Channels;
+using shaker.data.entity.Users;
 using shaker.domain.dto.Channels;
 
 namespace shaker.domain.Channels
@@ -12,56 +13,53 @@ namespace shaker.domain.Channels
     {
         private IRepository<Message> _repository;
 
-        public MessagesDomain(IRepository<Message> repository)
+        public MessagesDomain(
+            IRepository<Message> repository)
         {
             _repository = repository;
         }
 
-        public async Task<MessageDto> Create(MessageDto dto)
+        public MessageDto Create(MessageDto dto)
         {
+            Channel ch = new Channel();
+            ch.Id = dto.ChannelId;
             Message entity = new Message() {
-                ChannelId = dto.ChannelId,
-                UserId = dto.UserId,
+                Channel = ch,
+                User = new User(), // TODO Thread.User
                 Content = dto.Content,
                 Creation = DateTime.UtcNow
             };
 
-            Task<int> addMessageTask = Task.Run(() => _repository.Add(entity));
-
-            await addMessageTask;
-
-            dto.Id = addMessageTask.IsCompletedSuccessfully ? addMessageTask.Result : 0;
+            dto.Id = _repository.Add(entity);
 
             return dto;
         }
 
-        public async Task<bool> Delete(int id)
+        public bool DeleteOne(int id)
         {
-            Task<Message> getMessageTask = Task.Run(() => _repository.Get(id));
+            Message msg = _repository.Get(id);
 
-            Task<bool> removeMessageTask = getMessageTask.ContinueWith(getMsgTsk =>
-            {
-                if (getMsgTsk.IsCompletedSuccessfully)
-                {
-                    return _repository.Remove(getMessageTask.Result);
-                }
-                return false;
-            });
+            if (msg == null) return false;
 
-            return await removeMessageTask;
+            return _repository.Remove(msg);
         }
 
-        public async Task<IEnumerable<MessageDto>> GetAll(int channelId)
+        public bool DeleteAll(int channelId)
         {
-            Task<IEnumerable<MessageDto>> getAllMessagesTask =
-                Task.Run(() =>
-                {
-                    return  _repository.GetAll(
-                                ToMessageDtoSb(),
-                                msg => msg.ChannelId == channelId); 
-                });
+            IEnumerable<Message> msgs = _repository.GetAll(m => m.Channel.Id == channelId);
 
-            return await getAllMessagesTask;
+            bool state = msgs == null || !msgs.Any() ? true : false;
+            foreach(Message msg in msgs)
+            {
+                state = _repository.Remove(msg);
+            }
+
+            return state;
+        }
+
+        public IEnumerable<MessageDto> GetAll(int channelId)
+        {
+            return  _repository.GetAll(ToMessageDtoSb(), m => m.Channel.Id == channelId);
         }
 
         private static Expression<Func<Message, MessageDto>> ToMessageDtoSb()
@@ -69,8 +67,8 @@ namespace shaker.domain.Channels
             return msg => new MessageDto
             {
                 Id = msg.Id,
-                ChannelId = msg.ChannelId,
-                UserId = msg.UserId,
+                ChannelId = msg.Channel.Id,
+                UserId = msg.User.Id,
                 Content = msg.Content,
                 Creation = msg.Creation
             };

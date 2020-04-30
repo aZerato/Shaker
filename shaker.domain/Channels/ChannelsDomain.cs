@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using shaker.data.core;
 using shaker.data.entity.Channels;
 using shaker.domain.Channels;
@@ -22,7 +21,7 @@ namespace shaker.domain.Posts
             _messagesDomain = messagesDomain;
         }
 
-        public async Task<ChannelDto> Create(ChannelDto dto)
+        public ChannelDto Create(ChannelDto dto)
         {
             Channel entity = new Channel() {
                 Name = dto.Description,
@@ -31,95 +30,37 @@ namespace shaker.domain.Posts
                 Creation = DateTime.UtcNow
             };
 
-            Task<int> addChannelTask = Task.Run(() => {
-                return _channelRepository.Add(entity);
-            });
-
-            await Task.WhenAll(addChannelTask);
-
-            dto.Id = addChannelTask.IsCompleted ? addChannelTask.Result : 0;
+            dto.Id = _channelRepository.Add(entity);
 
             return dto;
         }
 
-        public async Task<bool> Delete(int id)
+        public bool Delete(int id)
         {
-            Task<Channel> getChannelTask = Task.Run(() => _channelRepository.Get(id));
+            Channel ch = _channelRepository.Get(id);
 
-            Task<bool> removeChannelTask =
-                getChannelTask.ContinueWith(getChTsk => {
-                        if (getChannelTask.IsCompletedSuccessfully && getChannelTask.Result != null)
-                        {
-                            return _channelRepository.Remove(getChannelTask.Result);
-                        }
-                        return false;  
-                    });
+            if (ch == null) return false;
 
-            Task<bool> removeMsgs = _messagesDomain.Delete(id);
-
-            Task<bool> removeChAndMsgs = removeChannelTask.ContinueWith((rmvChTsk) => {
-                    if (removeChannelTask.IsCompletedSuccessfully && removeChannelTask.Result)
-                    {
-                        return true;
-                    }
-                    return false;
-                });
-
-            await Task.WhenAll(removeChAndMsgs, removeMsgs);
-
-            return removeMsgs.Result;
+            return _channelRepository.Remove(ch) && _messagesDomain.DeleteAll(id);
         }
 
-        public async Task<ChannelDto> Get(int id, bool withMessages)
+        public ChannelDto Get(int id, bool withMessages)
         {
-            Task<ChannelDto> getChannelTask = Task.Run(() =>
+            Channel entity = _channelRepository.Get(id);
+            return new ChannelDto
             {
-                Channel entity = _channelRepository.Get(id);
-                return new ChannelDto
-                {
-                    Id = entity.Id,
-                    Name = entity.Name,
-                    Description = entity.Description,
-                    ImgPath = entity.ImgPath,
-                    Creation = entity.Creation
-                };
-            });
-
-            if (withMessages)
-            {
-                Task<ChannelDto> getDtoWithMessagesTask = await getChannelTask.ContinueWith(async (getChtsk) =>
-                 {
-                     if (getChannelTask.IsCompletedSuccessfully && getChannelTask.Result != null)
-                     {
-                         Task<IEnumerable<MessageDto>> getMsgsTsk = _messagesDomain.GetAll(id);
-
-                         await getMsgsTsk;
-
-                         getChtsk.Result.Messages = getMsgsTsk.Result;
-
-                         return getChtsk.Result;
-                     }
-                     return null;
-                 });
-
-                return await getDtoWithMessagesTask;
-            }
-            else
-            {
-                return await getChannelTask;
-            }
+                Id = entity.Id,
+                Name = entity.Name,
+                Description = entity.Description,
+                ImgPath = entity.ImgPath,
+                Creation = entity.Creation,
+                Messages = withMessages ? _messagesDomain.GetAll(id) : null
+            };
         }
 
-        public async Task<IEnumerable<ChannelDto>> GetAll()
+        public IEnumerable<ChannelDto> GetAll()
         {
-            Task<IEnumerable<ChannelDto>> getAllTsk =
-                Task.Run(() =>
-                {
-                    return _channelRepository.GetAll(
-                                ToChannelDtoSb());
-                });
-
-            return await getAllTsk;
+            return _channelRepository.GetAll(ToChannelDtoSb());
         }
 
         private static Expression<Func<Channel, ChannelDto>> ToChannelDtoSb()
