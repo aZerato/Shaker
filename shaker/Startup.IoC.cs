@@ -4,9 +4,11 @@ using shaker.Areas.WebSocketArea.Repositories;
 using shaker.data.core;
 using shaker.data.entity;
 using shaker.data.entity.Channels;
+using shaker.data.entity.Users;
 using shaker.data.Json;
 using shaker.domain.Channels;
 using shaker.domain.Posts;
+using shaker.domain.Users;
 
 namespace shaker
 {
@@ -23,6 +25,9 @@ namespace shaker
             services.AddTransient<IMessagesDomain, MessagesDomain>();
             services.AddTransient<IRepository<Channel>, Repository<Channel>>();
             services.AddTransient<IChannelsDomain, ChannelsDomain>();
+
+            services.AddTransient<IRepository<User>, Repository<User>>();
+            services.AddTransient<IUsersDomain, UsersDomain>();
 
             services.AddSingleton<IWebSocketRepository, WebSocketRepository>();
             services.AddSingleton<ChatWebSocketHandler>();

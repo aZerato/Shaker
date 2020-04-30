@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,17 +13,14 @@ namespace shaker.Areas.ChannelsArea.Controllers
     public class ChannelsController : Controller
     {
         private readonly IChannelsDomain _channelsDomain;
-        private readonly IMessagesDomain _messagesDomain;
         private readonly ILogger<ChannelsController> _logger;
 
         public ChannelsController(
             IChannelsDomain channelsDomain,
-            IMessagesDomain messagesDomain,
             ILogger<ChannelsController> logger
             )
         {
             _channelsDomain = channelsDomain;
-            _messagesDomain = messagesDomain;
             _logger = logger;
         }
 
@@ -33,12 +28,6 @@ namespace shaker.Areas.ChannelsArea.Controllers
         [HttpGet]
         public async Task<IEnumerable<ChannelDto>> Get()
         {
-            //var dto = new MessageDto();
-            //dto.ChannelId = 1;
-            //dto.Content = "test";
-            //dto.UserId = 1;
-            //await _messagesDomain.Create(dto);
-
             return await _channelsDomain.GetAll();
         }
 
@@ -51,8 +40,9 @@ namespace shaker.Areas.ChannelsArea.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public Task<ChannelDto> Post([FromBody]ChannelDto dto)
         {
+            return await _channelsDomain.Create(dto);
         }
 
         // PUT api/values/5

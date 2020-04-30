@@ -9,13 +9,13 @@ namespace shaker.data.Json
     public class JsonDbSet<TEntity> : IDbSet<TEntity>
         where TEntity : IBaseEntity
     {
-        private ILiteDatabase _liteDatabase;
-        private ILiteCollection<TEntity> _collection;
+        private readonly ILiteDatabase _liteDatabase;
+        private readonly ILiteCollection<TEntity> _collection;
 
         public JsonDbSet(ILiteDatabase liteDatabase)
         {
             _liteDatabase = liteDatabase;
-            _collection = _liteDatabase.GetCollection<TEntity>(nameof(TEntity));
+            _collection = _liteDatabase.GetCollection<TEntity>(typeof(TEntity).Name);
         }
 
         public int Add(TEntity entity)

@@ -13,5 +13,6 @@
   <ItemGroup>
     <Folder Include="Posts\" />
     <Folder Include="Channels\" />
+    <Folder Include="Users\" />
   </ItemGroup>
 </Project>
