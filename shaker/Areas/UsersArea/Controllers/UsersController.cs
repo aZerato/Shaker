@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using shaker.domain.Users;
 
 namespace shaker.Areas.UsersArea.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class UsersController : Controller
     {
@@ -31,12 +32,6 @@ namespace shaker.Areas.UsersArea.Controllers
         public UserDto Get(int id)
         {
             return _usersDomain.Get(id);
-        }
-
-        [HttpPost]
-        public UserDto Post([FromBody]AuthDto dto)
-        {
-            return _usersDomain.Create(dto);
         }
 
         [HttpPut("{id}")]

@@ -4,7 +4,7 @@ namespace shaker.domain.Users
 {
     public interface IUsersDomain
     {
-        bool IsAuthenticated(AuthDto dto);
+        UserDto IsAuthenticated(AuthDto dto);
 
         UserDto Create(AuthDto dto);
 

@@ -21,15 +21,15 @@ namespace shaker.domain.Users
             _passwordHasher = passwordHasher;
         }
 
-        public bool IsAuthenticated(AuthDto dto)
+        public UserDto IsAuthenticated(AuthDto dto)
         {
             string hashedPwd = _passwordHasher.HashPassword(dto, dto.Password);
-            
-            bool isAuthenticated = _repository
-                .GetAll(u => u.UserName == dto.UserName && u.PasswordHash == hashedPwd)
-                .FirstOrDefault() != null;
 
-            return isAuthenticated;
+            User user = _repository
+                .GetAll(u => u.UserName == dto.UserName && u.PasswordHash == hashedPwd)
+                .SingleOrDefault();
+
+            return ToUserDto(user);
         }
 
         public UserDto Create(AuthDto dto)
@@ -37,11 +37,13 @@ namespace shaker.domain.Users
             User userNameExists = _repository.GetAll(u => u.UserName == dto.UserName).FirstOrDefault();
 
             if (userNameExists != null) return null;
-    
+
+            string hashedPwd = _passwordHasher.HashPassword(dto, dto.Password);
+
             User entity = new User()
             {
                 UserName = dto.UserName,
-                PasswordHash = dto.Password,
+                PasswordHash = hashedPwd,
                 LastConnection = DateTime.UtcNow,
                 Creation = DateTime.UtcNow
             };
@@ -81,11 +83,11 @@ namespace shaker.domain.Users
             return u => new UserDto
             {
                 Id = u.Id,
+                UserName = u.UserName,
                 Firstname = u.Firstname,
                 Name = u.Name,
                 Email = u.Email,
-                Creation = u.Creation,
-                LastConnection = u.LastConnection
+                Creation = u.Creation
             };
         }
 
@@ -95,11 +97,11 @@ namespace shaker.domain.Users
                 new UserDto
                 {
                     Id = u.Id,
+                    UserName = u.UserName,
                     Firstname = u.Firstname,
                     Name = u.Name,
                     Email = u.Email,
-                    Creation = u.Creation,
-                    LastConnection = u.LastConnection
+                    Creation = u.Creation
                 };
         }
     }

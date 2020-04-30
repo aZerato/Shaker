@@ -14,10 +14,8 @@ namespace shaker.domain.Users
 
         public string Email { get; set; }
 
-        public string Password { get; set; }
-
-        public DateTime LastConnection { get; set; }
-
         public DateTime Creation { get; set; }
+
+        public string Token { get; set; }   
     }
 }

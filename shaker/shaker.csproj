@@ -28,6 +28,7 @@
     <Folder Include="Areas\ChannelsArea\Controllers\" />
     <Folder Include="Areas\UsersArea\" />
     <Folder Include="Areas\UsersArea\Controllers\" />
+    <Folder Include="Areas\UsersArea\Auth\" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="bd.json" />
