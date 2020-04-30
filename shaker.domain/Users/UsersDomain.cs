@@ -23,13 +23,32 @@ namespace shaker.domain.Users
 
         public UserDto IsAuthenticated(AuthDto dto)
         {
-            string hashedPwd = _passwordHasher.HashPassword(dto, dto.Password);
+            User matchingUser = _repository.GetAll(u => u.UserName == dto.UserName).FirstOrDefault();
 
-            User user = _repository
-                .GetAll(u => u.UserName == dto.UserName && u.PasswordHash == hashedPwd)
-                .SingleOrDefault();
+            PasswordVerificationResult pwdResult = _passwordHasher.VerifyHashedPassword(dto, matchingUser.PasswordHash, dto.Password);
 
-            return ToUserDto(user);
+            if (pwdResult == PasswordVerificationResult.Failed)
+            {
+                matchingUser.AccessFailedCount++;
+
+                _repository.Update(matchingUser);
+
+                return null;
+            }
+
+            if (pwdResult == PasswordVerificationResult.SuccessRehashNeeded)
+            {
+                string hashedPwd = _passwordHasher.HashPassword(dto, dto.Password);
+
+                matchingUser.PasswordHash = hashedPwd;
+                
+            }
+
+            matchingUser.LastConnection = DateTime.UtcNow;
+
+            _repository.Update(matchingUser);
+
+            return ToUserDto(matchingUser);
         }
 
         public UserDto Create(AuthDto dto)

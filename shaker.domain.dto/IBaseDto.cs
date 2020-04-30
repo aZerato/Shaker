@@ -7,5 +7,6 @@ namespace shaker.domain
     /// </summary>
     public interface IBaseDto : IBaseEntity
     {
+        public string Error { get; set; }
     }
 }

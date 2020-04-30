@@ -13,8 +13,10 @@ namespace shaker.domain.dto.Channels
 
         public string ImgPath { get; set; }
 
+        public IEnumerable<MessageDto> Messages { get; set; }
+
         public DateTime Creation { get; set; }
 
-        public IEnumerable<MessageDto> Messages { get; set; }
+        public string Error { get; set; }
     }
 }
