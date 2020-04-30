@@ -3,6 +3,7 @@ using LiteDB;
 using shaker.data.core;
 using shaker.data.entity;
 using shaker.data.entity.Channels;
+using shaker.data.entity.Users;
 
 namespace shaker.data.Json
 {
@@ -17,6 +18,7 @@ namespace shaker.data.Json
 
         #region ---- properties ----
 
+        public JsonDbSet<User> Users { get; set; }
         public JsonDbSet<Post> Posts { get; set; }
         public JsonDbSet<Message> Messages { get; set; }
         public JsonDbSet<Channel> Channels { get; set; }

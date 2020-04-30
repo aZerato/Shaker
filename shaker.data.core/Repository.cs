@@ -108,6 +108,17 @@ namespace shaker.data.core
         }
 
         /// <summary>
+        /// <see cref="IRepository{TEntity}.GetAll(Expression)"/>
+        /// </summary>
+        /// <typeparam name="TResult"><see cref="IRepository{TEntity}.GetAll(Expression)"/></typeparam>
+        /// <param name="predicate"><see cref="IRepository{TEntity}.GetAll(Expression)"/></param>
+        /// <returns><see cref="IRepository{TEntity}.GetAllAndCount(Expression)"/></returns>
+        public virtual IEnumerable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate)
+        {
+            return _currentUoW.CreateSet<TEntity>().Where(predicate);
+        }
+
+        /// <summary>
         /// <see cref="IRepository{TEntity}.GetAll(Expression, Expression)"/>
         /// </summary>
         /// <typeparam name="TResult"><see cref="IRepository{TEntity}.GetAll(Expression, Expression)"/></typeparam>

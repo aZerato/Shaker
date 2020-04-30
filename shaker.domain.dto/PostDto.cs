@@ -10,6 +10,6 @@ namespace shaker.domain.dto
 
         public string Description { get; set; }
 
-        public DateTime Creation { get; set;  }
+        public DateTime Creation { get; set; }
     }
 }
