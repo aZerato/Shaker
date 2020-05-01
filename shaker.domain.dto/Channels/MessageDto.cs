@@ -13,5 +13,7 @@ namespace shaker.domain.dto.Channels
         public string Content { get; set; }
 
         public DateTime Creation { get; set; }
+
+        public string Error { get; set; }
     }
 }

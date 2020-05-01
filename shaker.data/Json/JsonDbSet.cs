@@ -28,9 +28,14 @@ namespace shaker.data.Json
             _collection.Query().ForUpdate();
         }
 
-        public void Remove(TEntity entity)
+        public bool Update(TEntity entity)
         {
-            _collection.Delete(entity.Id);
+            return _collection.Update(entity);
+        }
+
+        public bool Remove(TEntity entity)
+        {
+            return _collection.Delete(entity.Id);
         }
 
         public TEntity Find(int id)

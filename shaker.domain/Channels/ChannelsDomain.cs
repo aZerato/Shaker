@@ -24,10 +24,10 @@ namespace shaker.domain.Posts
         public ChannelDto Create(ChannelDto dto)
         {
             Channel entity = new Channel() {
-                Name = dto.Description,
+                Name = dto.Name,
                 Description = dto.Description,
                 ImgPath = dto.ImgPath,
-                Creation = DateTime.UtcNow
+                Creation = DateTime.UtcNow.Date
             };
 
             dto.Id = _channelRepository.Add(entity);
@@ -47,6 +47,29 @@ namespace shaker.domain.Posts
         public ChannelDto Get(int id, bool withMessages)
         {
             Channel entity = _channelRepository.Get(id);
+            return ToChannelDto(entity, true);
+        }
+
+        public ChannelDto Update(int id, ChannelDto dto)
+        {
+            Channel entity = _channelRepository.Get(id);
+
+            entity.Name = dto.Name;
+            entity.Description = dto.Description;
+            entity.ImgPath = dto.ImgPath;
+
+            _channelRepository.Update(entity);
+
+            return ToChannelDto(entity, true);
+        }
+
+        public IEnumerable<ChannelDto> GetAll()
+        {
+            return _channelRepository.GetAll(ToChannelDtoSb());
+        }
+
+        private ChannelDto ToChannelDto(Channel entity, bool withMessages)
+        {
             return new ChannelDto
             {
                 Id = entity.Id,
@@ -54,13 +77,8 @@ namespace shaker.domain.Posts
                 Description = entity.Description,
                 ImgPath = entity.ImgPath,
                 Creation = entity.Creation,
-                Messages = withMessages ? _messagesDomain.GetAll(id) : null
+                Messages = withMessages ? _messagesDomain.GetAll(entity.Id) : null
             };
-        }
-
-        public IEnumerable<ChannelDto> GetAll()
-        {
-            return _channelRepository.GetAll(ToChannelDtoSb());
         }
 
         private static Expression<Func<Channel, ChannelDto>> ToChannelDtoSb()

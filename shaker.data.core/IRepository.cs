@@ -26,7 +26,7 @@ namespace shaker.data.core
         /// Update an entity to context.
         /// </summary>
         /// <param name="entity">The entity object.</param>
-        void Update(TEntity entity);
+        bool Update(TEntity entity);
 
         /// <summary>
         /// Get an entity by id from context.

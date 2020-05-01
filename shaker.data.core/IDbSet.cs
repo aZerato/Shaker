@@ -11,7 +11,9 @@ namespace shaker.data.core
 
         void Attach(TEntity entity);
 
-        void Remove(TEntity entity);
+        bool Update(TEntity entity);
+
+        bool Remove(TEntity entity);
 
         TEntity Find(int id);
 

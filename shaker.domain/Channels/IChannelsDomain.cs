@@ -11,6 +11,8 @@ namespace shaker.domain.Channels
 
         ChannelDto Get(int id, bool withMessages = false);
 
+        ChannelDto Update(int id, ChannelDto dto);
+
         IEnumerable<ChannelDto> GetAll();
     }
 }

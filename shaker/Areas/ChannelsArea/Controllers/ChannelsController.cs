@@ -40,8 +40,9 @@ namespace shaker.Areas.ChannelsArea.Controllers
         }
 
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]ChannelDto value)
+        public ChannelDto Put(int id, [FromBody]ChannelDto dto)
         {
+            return _channelsDomain.Update(id, dto);
         }
 
         [HttpDelete("{id}")]
