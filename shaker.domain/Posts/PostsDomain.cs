@@ -21,7 +21,7 @@ namespace shaker.domain.Posts
             Post postEntity = new Post() {
                 Content = postDto.Content,
                 Description = postDto.Description,
-                Creation = DateTime.UtcNow
+                Creation = DateTime.UtcNow.Date
             };
 
             postDto.Id = _postsRepository.Add(postEntity);

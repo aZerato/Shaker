@@ -61,8 +61,7 @@ namespace shaker.data.core
                 var oSet = uow.CreateSet<TEntity>();
 
                 oSet.Attach(entity);
-                oSet.Remove(entity);
-                state = true;
+                state = oSet.Remove(entity);
             }
             return state;
         }
@@ -71,9 +70,17 @@ namespace shaker.data.core
         /// <see cref="IRepository{TEntity}.Update(TEntity)"/>
         /// </summary>
         /// <param name="entity"><see cref="IRepository{TEntity}.Update(TEntity)"/></param>
-        public virtual void Update(TEntity entity)
+        public virtual bool Update(TEntity entity)
         {
-            _currentUoW.SetModified(entity);
+            bool state = false;
+            using (var uow = _currentUoW)
+            {
+                var oSet = uow.CreateSet<TEntity>();
+
+                oSet.Attach(entity);
+                state = oSet.Update(entity);
+            }
+            return state;
         }
 
         /// <summary>

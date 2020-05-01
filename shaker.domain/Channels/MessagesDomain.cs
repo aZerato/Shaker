@@ -27,7 +27,7 @@ namespace shaker.domain.Channels
                 Channel = ch,
                 User = new User(), // TODO Thread.User
                 Content = dto.Content,
-                Creation = DateTime.UtcNow
+                Creation = DateTime.UtcNow.Date
             };
 
             dto.Id = _repository.Add(entity);

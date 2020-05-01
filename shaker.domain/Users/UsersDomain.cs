@@ -44,7 +44,7 @@ namespace shaker.domain.Users
                 
             }
 
-            matchingUser.LastConnection = DateTime.UtcNow;
+            matchingUser.LastConnection = DateTime.UtcNow.Date;
 
             _repository.Update(matchingUser);
 
@@ -63,8 +63,8 @@ namespace shaker.domain.Users
             {
                 UserName = dto.UserName,
                 PasswordHash = hashedPwd,
-                LastConnection = DateTime.UtcNow,
-                Creation = DateTime.UtcNow
+                LastConnection = DateTime.UtcNow.Date,
+                Creation = DateTime.UtcNow.Date
             };
 
             UserDto userDto = new UserDto
