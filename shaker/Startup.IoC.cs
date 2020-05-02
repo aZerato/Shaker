@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using shaker.Areas.UsersArea.Auth;
-using shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers;
-using shaker.Areas.WebSocketArea.Repositories;
 using shaker.data.core;
 using shaker.data.entity;
 using shaker.data.entity.Channels;
@@ -33,9 +31,6 @@ namespace shaker
             services.AddTransient<IRepository<User>, Repository<User>>();
             services.AddTransient<IPasswordHasher<AuthDto>, PasswordHasher<AuthDto>>();
             services.AddTransient<IUsersDomain, UsersDomain>();
-
-            services.AddSingleton<IWebSocketRepository, WebSocketRepository>();
-            services.AddSingleton<ChatWebSocketHandler>();
         }
     }
 }

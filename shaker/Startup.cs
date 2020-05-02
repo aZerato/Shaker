@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
+using MessagePack;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using shaker.Areas.WebSocketArea.Hubs;
 using shaker.data.entity.Users;
 
 namespace shaker
@@ -28,6 +31,22 @@ namespace shaker
             services.AddRazorPages()
                 .AddRazorRuntimeCompilation();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy", builder => builder
+                                                    .AllowAnyOrigin()
+                                                    .AllowAnyMethod()
+                                                    .AllowAnyHeader());
+            });
+
+            services.AddSignalR(o => { o.EnableDetailedErrors = true; })
+                .AddMessagePackProtocol(options =>
+                 {
+                     options.FormatterResolvers = new List<IFormatterResolver>()
+                    {
+                        MessagePack.Resolvers.StandardResolver.Instance
+                    };
+                 });
 
             ConfigureAuth(services);
         }
@@ -51,11 +70,7 @@ namespace shaker
 
             app.UseRouting();
 
-            // global cors policy
-            app.UseCors(x => x
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
+            app.UseCors("CorsPolicy");
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -69,9 +84,9 @@ namespace shaker
                 endpoints.MapControllerRoute(
                     name: "api",
                     pattern: "api/{controller=Home}/{action=Index}/{id?}");
-            });
 
-            ConfigureWebSocket(app, env, services);
+                endpoints.MapHub<ChannelHub>("hub/channel");
+            });
         }
     }
 }
