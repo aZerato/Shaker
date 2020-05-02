@@ -42,7 +42,6 @@ namespace shaker
                 .AddRazorRuntimeCompilation();
 
             services.AddSignalR(o => {
-                    o.MaximumReceiveMessageSize = 102400000;
                     o.EnableDetailedErrors = true;
                 })
                 .AddMessagePackProtocol(options =>

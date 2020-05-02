@@ -25,7 +25,7 @@ namespace shaker.domain.Channels
             ch.Id = dto.ChannelId;
             Message entity = new Message() {
                 Channel = ch,
-                User = new User(), // TODO Thread.User
+                User = new User() { Id = dto.UserId },
                 Content = dto.Content,
                 Creation = DateTime.UtcNow.Date
             };
