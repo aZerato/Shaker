@@ -24,11 +24,10 @@
   <ItemGroup>
     <Folder Include="Models\Posts\" />
     <Folder Include="Views\Blog\" />
-    <Folder Include="Areas\ChannelsArea\" />
-    <Folder Include="Areas\ChannelsArea\Controllers\" />
-    <Folder Include="Areas\UsersArea\" />
-    <Folder Include="Areas\UsersArea\Controllers\" />
-    <Folder Include="Areas\UsersArea\Auth\" />
+    <Folder Include="Areas\Api\" />
+    <Folder Include="Areas\Api\Controllers\" />
+    <Folder Include="Areas\Hubs\" />
+    <Folder Include="Areas\Api\Auth\" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="bd.json" />

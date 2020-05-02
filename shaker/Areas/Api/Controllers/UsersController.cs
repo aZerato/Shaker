@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using shaker.domain.Users;
 
-namespace shaker.Areas.UsersArea.Controllers
+namespace shaker.Areas.Api.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]

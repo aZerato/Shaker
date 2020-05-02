@@ -2,12 +2,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using shaker.domain.Users;
 
-namespace shaker.Areas.UsersArea.Auth
+namespace shaker.Areas.Api.Auth
 {
     public class JwtAuth : IJwtAuth
     {

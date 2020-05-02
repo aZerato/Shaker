@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using shaker.Areas.UsersArea.Auth;
+using shaker.Areas.Api.Auth;
 using shaker.domain.Users;
 
-namespace shaker.Areas.UsersArea.Controllers
+namespace shaker.Areas.Api.Controllers
 {
     public class AuthController : Controller
     {

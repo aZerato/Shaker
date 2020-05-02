@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using shaker.Areas.UsersArea.Auth;
+using shaker.Areas.Api.Auth;
 using shaker.data.core;
 using shaker.data.entity;
 using shaker.data.entity.Channels;

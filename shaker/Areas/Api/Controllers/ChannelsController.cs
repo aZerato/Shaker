@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using shaker.domain.Channels;
 using shaker.domain.dto.Channels;
 
-namespace shaker.Areas.ChannelsArea.Controllers
+namespace shaker.Areas.Api.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]

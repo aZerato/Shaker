@@ -4,10 +4,11 @@ using MessagePack;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using shaker.Areas.WebSocketArea.Hubs;
+using shaker.Areas.Hubs;
 using shaker.data.entity.Users;
 
 namespace shaker
@@ -24,6 +25,15 @@ namespace shaker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy", builder =>
+                    builder.WithOrigins("http://localhost:4200")
+                           .AllowAnyMethod()
+                           .AllowAnyHeader()
+                           .AllowCredentials());
+            });
+
             services.AddControllersWithViews();
 
             ConfigureServicesIoC(services);
@@ -31,15 +41,10 @@ namespace shaker
             services.AddRazorPages()
                 .AddRazorRuntimeCompilation();
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy", builder => builder
-                                                    .AllowAnyOrigin()
-                                                    .AllowAnyMethod()
-                                                    .AllowAnyHeader());
-            });
-
-            services.AddSignalR(o => { o.EnableDetailedErrors = true; })
+            services.AddSignalR(o => {
+                    o.MaximumReceiveMessageSize = 102400000;
+                    o.EnableDetailedErrors = true;
+                })
                 .AddMessagePackProtocol(options =>
                  {
                      options.FormatterResolvers = new List<IFormatterResolver>()
@@ -54,6 +59,8 @@ namespace shaker
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services)
         {
+            app.UseCors("CorsPolicy");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -69,8 +76,6 @@ namespace shaker
             app.UseStaticFiles();
 
             app.UseRouting();
-
-            app.UseCors("CorsPolicy");
 
             app.UseAuthentication();
             app.UseAuthorization();
