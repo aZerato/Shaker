@@ -10,6 +10,8 @@ namespace shaker.domain.dto.Channels
 
         public int ChannelId { get; set; }
 
+        public MessageType Type { get; set; }
+
         public string Content { get; set; }
 
         public DateTime Creation { get; set; }

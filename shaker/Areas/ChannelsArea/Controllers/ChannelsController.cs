@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using shaker.domain.Channels;
@@ -6,6 +7,7 @@ using shaker.domain.dto.Channels;
 
 namespace shaker.Areas.ChannelsArea.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class ChannelsController : Controller
     {

@@ -6,7 +6,7 @@ using shaker.domain.Users;
 
 namespace shaker.Areas.UsersArea.Controllers
 {
-   // [Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     public class UsersController : Controller
     {

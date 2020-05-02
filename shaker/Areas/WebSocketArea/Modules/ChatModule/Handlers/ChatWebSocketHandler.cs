@@ -4,10 +4,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using shaker.Areas.WebSocketArea.Handlers;
 using shaker.Areas.WebSocketArea.Models;
-using shaker.Areas.WebSocketArea.Modules.ChatModule.Models;
 using shaker.Areas.WebSocketArea.Repositories;
+using shaker.domain.dto.Channels;
 
 namespace shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers
 {
@@ -17,7 +18,9 @@ namespace shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers
 
         public string Path { get; set; }
 
-        public ChatWebSocketHandler(IWebSocketRepository webSocketRepository, string path = "/ws/chat") 
+        public ChatWebSocketHandler(
+            IWebSocketRepository webSocketRepository,
+            string path = "/ws/channel") 
         {
             _wsRepository = webSocketRepository;
             Path = path;
@@ -54,11 +57,11 @@ namespace shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers
             try
             {
                 string msg = Encoding.ASCII.GetString(buffer);
-                ChatWsMessage message = JsonConvert.DeserializeObject<ChatWsMessage>(msg);
+                MessageDto message = JsonConvert.DeserializeObject<MessageDto>(msg);
                 string serialisedMessage = JsonConvert.SerializeObject(message);
                 byte[] bufferUpadted = Encoding.ASCII.GetBytes(serialisedMessage);
 
-                if (message.Type == ChatWsMessageType.Message)
+                if (message.Type == MessageType.Message)
                 {
                     //await BroadcastOthers(serialisedMessage, bufferUpadted, webSocketMessage);
                     await BroadcastAll(serialisedMessage, bufferUpadted, webSocketMessage);
@@ -78,7 +81,6 @@ namespace shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers
         {
             WebSocket webSocket = webSocketMessage.Ws;
 
-
             await WelcomeMessage(webSocket);
 
             await UserConnectedMessageToOthers(webSocketMessage);
@@ -86,14 +88,13 @@ namespace shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers
 
         private async Task WelcomeMessage(WebSocket webSocket)
         {
-            ChatWsMessage msg = new ChatWsMessage
-            {
-                Type = ChatWsMessageType.System,
-                Text = "Welcome",
-                Username = "system"
-            };
+            MessageDto msg = new MessageDto();
+            msg.Content = "Welcome";
+            msg.Type = MessageType.System;
 
-            string serialisedMessage = JsonConvert.SerializeObject(msg, Formatting.Indented);
+            var serializerSettings = new JsonSerializerSettings();
+            serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            string serialisedMessage = JsonConvert.SerializeObject(msg, Formatting.Indented, serializerSettings);
 
             byte[] bytes = Encoding.ASCII.GetBytes(serialisedMessage);
 
@@ -106,14 +107,13 @@ namespace shaker.Areas.WebSocketArea.Modules.ChatModule.Handlers
 
         private async Task UserConnectedMessageToOthers(WebSocketMessage webSocketMessage)
         {
-            ChatWsMessage msg = new ChatWsMessage
-            {
-                Type = ChatWsMessageType.System,
-                Text = "Welcome to a new user",
-                Username = "system"
-            };
+            MessageDto msg = new MessageDto();
+            msg.Content = "Welcome to a new user";
+            msg.Type = MessageType.System;
 
-            string serialisedMessage = JsonConvert.SerializeObject(msg, Formatting.Indented);
+            var serializerSettings = new JsonSerializerSettings();
+            serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            string serialisedMessage = JsonConvert.SerializeObject(msg, Formatting.Indented, serializerSettings);
 
             byte[] bytes = Encoding.ASCII.GetBytes(serialisedMessage);
 
