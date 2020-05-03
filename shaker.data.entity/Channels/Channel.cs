@@ -1,13 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
+using LiteDB;
 using shaker.data.core;
-using shaker.data.entity.Users;
 
 namespace shaker.data.entity.Channels
 {
     public class Channel : IBaseEntity
     {
-        public int Id { get; set; }
+        public Channel()
+        {
+            Id = ObjectId.NewObjectId().ToString();
+        }
+
+        [BsonId]
+        public string Id { get; set; }
 
         public string Name { get; set; }
 
@@ -16,7 +21,5 @@ namespace shaker.data.entity.Channels
         public string ImgPath { get; set; }
 
         public DateTime Creation { get; set; }
-
-        public IList<User> Users { get; set; }
     }
 }

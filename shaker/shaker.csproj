@@ -20,6 +20,9 @@
     <ProjectReference Include="..\shaker.data\shaker.data.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
+    <ProjectReference Include="..\shaker.crosscutting\shaker.crosscutting.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\Posts\" />

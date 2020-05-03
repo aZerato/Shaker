@@ -1,4 +1,5 @@
 ﻿using System;
+using LiteDB;
 using shaker.data.core;
 using shaker.data.entity.Users;
 
@@ -6,11 +7,19 @@ namespace shaker.data.entity.Channels
 {
     public class Message : IBaseEntity
     {
-        public int Id { get; set; }
+        public Message()
+        {
+            Id = ObjectId.NewObjectId().ToString();
+        }
 
-        public User User { get; set; }
+        [BsonId]
+        public string Id { get; set; }
+
+        public virtual User User { get; set; }
+        public string UserId { get; set; }
 
         public Channel Channel { get; set; }
+        public string ChannelId { get; set; }
 
         public string Content { get; set; }
 

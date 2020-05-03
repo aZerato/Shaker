@@ -1,5 +1,4 @@
-﻿using System;
-using LiteDB;
+﻿using LiteDB;
 using shaker.data.core;
 using shaker.data.entity;
 using shaker.data.entity.Channels;
@@ -9,19 +8,22 @@ namespace shaker.data.Json
 {
     public class JsonUnitOfWork : IUnitOfWork
     {
-        private LiteDatabase _liteDatabase;
+        private readonly LiteDatabase _liteDatabase;
 
-        public JsonUnitOfWork(string jsonBdpath)
+        public JsonUnitOfWork(string path)
         {
-            _liteDatabase = new LiteDatabase(jsonBdpath);
+            _liteDatabase = new LiteDatabase(path);
         }
 
         #region ---- properties ----
 
         public JsonDbSet<User> Users { get; set; }
+        public JsonDbSet<Role> Roles { get; set; }
+
         public JsonDbSet<Post> Posts { get; set; }
         public JsonDbSet<Message> Messages { get; set; }
         public JsonDbSet<Channel> Channels { get; set; }
+        
 
         #endregion
 

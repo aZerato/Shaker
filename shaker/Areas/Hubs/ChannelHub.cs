@@ -5,16 +5,23 @@ using System;
 
 namespace shaker.Areas.Hubs
 {
+    using Microsoft.AspNetCore.Authorization;
+    using shaker.crosscutting.Accessors;
     using shaker.domain.Channels;
     using shaker.domain.dto.Channels;
 
+    [Authorize]
     public class ChannelHub : Hub
     {
+        private readonly IConnectedUserAccessor _connectedUserAccessor;
         private readonly IMessagesDomain _messageDomain;
+        public static string Path = "/hub/channel";
 
         public ChannelHub(
+            IConnectedUserAccessor connectedUserAccessor,
             IMessagesDomain messageDomain)
         {
+            _connectedUserAccessor = connectedUserAccessor;
             _messageDomain = messageDomain;
         }
 
@@ -29,10 +36,9 @@ namespace shaker.Areas.Hubs
             await Clients.All.SendAsync("BroadcastMessage", messageJson);
         }
 
-        public async Task RegisterConnection(int userId)
-        {
-            
-            await Clients.All.SendAsync("RegisterConnection", userId);
+        public async Task RegisterConnection()
+        {   
+            await Clients.All.SendAsync("RegisterConnection", _connectedUserAccessor.GetId());
         }
 
         public override async Task OnConnectedAsync()

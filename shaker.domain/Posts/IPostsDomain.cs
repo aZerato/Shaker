@@ -7,7 +7,7 @@ namespace shaker.domain.Posts
     {
         PostDto Create(PostDto post);
 
-        void Delete(int id);
+        void Delete(string id);
 
         IEnumerable<PostDto> GetAll();
     }

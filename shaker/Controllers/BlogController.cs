@@ -72,7 +72,7 @@ namespace shaker.Controllers
             return View();
         }
 
-        public IActionResult Delete(int id)
+        public IActionResult Delete(string id)
         {
             try
             {

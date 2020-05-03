@@ -6,13 +6,13 @@ namespace shaker.domain.dto.Channels
     public class MessageDto : IBaseDto
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty("userId")]
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         [JsonProperty("channelId")]
-        public int ChannelId { get; set; }
+        public string ChannelId { get; set; }
 
         [JsonProperty("type")]
         public MessageType Type { get; set; }

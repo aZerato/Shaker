@@ -1,4 +1,4 @@
-﻿using System;
+﻿using LiteDB;
 
 namespace shaker.data.core
 {
@@ -10,11 +10,7 @@ namespace shaker.data.core
         /// <summary>
         /// Gets or sets the Identifier.
         /// </summary>
-        int Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Creation date.
-        /// </summary>
-        DateTime Creation { get; set; }
+        [BsonId]
+        string Id { get; set; }
     }
 }

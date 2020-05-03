@@ -1,6 +1,9 @@
+using System.Security.Principal;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using shaker.Areas.Api.Auth;
+using shaker.crosscutting.Accessors;
 using shaker.data.core;
 using shaker.data.entity;
 using shaker.data.entity.Channels;
@@ -26,9 +29,15 @@ namespace shaker
             services.AddTransient<IRepository<Channel>, Repository<Channel>>();
             services.AddTransient<IChannelsDomain, ChannelsDomain>();
 
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddTransient<IPrincipal>(
+                provider => provider.GetService<IHttpContextAccessor>().HttpContext.User);
+            services.AddTransient<IConnectedUserAccessor, ConnectedUserAccessor>();
             services.AddTransient<IJwtAuth, JwtAuth>();
-
+            services.AddTransient<IUserStore<User>, UserStore>();
+            services.AddTransient<IRoleStore<Role>, RoleStore>();
             services.AddTransient<IRepository<User>, Repository<User>>();
+            services.AddTransient<IRepository<Role>, Repository<Role>>();
             services.AddTransient<IPasswordHasher<AuthDto>, PasswordHasher<AuthDto>>();
             services.AddTransient<IUsersDomain, UsersDomain>();
         }

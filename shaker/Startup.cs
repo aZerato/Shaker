@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -56,13 +57,12 @@ namespace shaker
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services, UserManager<User> userManager)
         {
-            app.UseCors("CorsPolicy");
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                ConfigureAuthApp(app, userManager);
             }
             else
             {
@@ -70,6 +70,8 @@ namespace shaker
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseCors("CorsPolicy");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -89,7 +91,7 @@ namespace shaker
                     name: "api",
                     pattern: "api/{controller=Home}/{action=Index}/{id?}");
 
-                endpoints.MapHub<ChannelHub>("hub/channel");
+                endpoints.MapHub<ChannelHub>(ChannelHub.Path);
             });
         }
     }

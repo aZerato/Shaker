@@ -30,7 +30,7 @@ namespace shaker.Areas.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public ChannelDto Get(int id, bool msgs)
+        public ChannelDto Get(string id, bool msgs)
         {
             return _channelsDomain.Get(id, msgs);
         }
@@ -42,13 +42,13 @@ namespace shaker.Areas.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public ChannelDto Put(int id, [FromBody]ChannelDto dto)
+        public ChannelDto Put(string id, [FromBody]ChannelDto dto)
         {
             return _channelsDomain.Update(id, dto);
         }
 
         [HttpDelete("{id}")]
-        public bool Delete(int id)
+        public bool Delete(string id)
         {
             return _channelsDomain.Delete(id);
         }

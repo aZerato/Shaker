@@ -29,18 +29,18 @@ namespace shaker.Areas.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public UserDto Get(int id)
+        public UserDto Get(string id)
         {
             return _usersDomain.Get(id);
         }
 
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]UserDto value)
+        public void Put(string id, [FromBody]UserDto value)
         {
         }
 
         [HttpDelete("{id}")]
-        public bool Delete(int id)
+        public bool Delete(string id)
         {
             return _usersDomain.Delete(id);
         }

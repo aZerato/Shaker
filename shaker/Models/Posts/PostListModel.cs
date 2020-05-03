@@ -4,7 +4,7 @@ namespace shaker.Models.Posts
 {
     public class PostListModel
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public string Content { get; set; }
 

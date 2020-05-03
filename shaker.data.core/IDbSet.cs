@@ -7,7 +7,9 @@ namespace shaker.data.core
     public interface IDbSet<TEntity>
         where TEntity : IBaseEntity
     {
-        int Add(TEntity entity);
+        bool EnsureUniqueIndex(string propertyName);
+
+        string Add(TEntity entity);
 
         void Attach(TEntity entity);
 
@@ -15,7 +17,7 @@ namespace shaker.data.core
 
         bool Remove(TEntity entity);
 
-        TEntity Find(int id);
+        TEntity Find(string id);
 
         IEnumerable<TEntity> AsEnumerable();
 
