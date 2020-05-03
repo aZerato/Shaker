@@ -29,7 +29,7 @@ namespace shaker.domain.Posts
             return postDto;
         }
 
-        public void Delete(int id)
+        public void Delete(string id)
         {
             Post post = _postsRepository.Get(id);
             _postsRepository.Remove(post);

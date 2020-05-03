@@ -1,6 +1,6 @@
 ﻿using shaker.domain.Users;
 
-namespace shaker.Areas.UsersArea.Auth
+namespace shaker.Areas.Api.Auth
 {
     public interface IJwtAuth
     {

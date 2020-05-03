@@ -8,10 +8,12 @@ namespace shaker.domain.Users
 
         UserDto Create(AuthDto dto);
 
-        bool Delete(int id);
+        bool Delete(string id);
 
-        UserDto Get(int id);
+        UserDto Get(string id);
 
         IEnumerable<UserDto> GetAll();
+
+        bool Update(UserDto dto);
     }
 }

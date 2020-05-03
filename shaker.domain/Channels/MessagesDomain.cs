@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using shaker.crosscutting.Accessors;
 using shaker.data.core;
 using shaker.data.entity.Channels;
 using shaker.data.entity.Users;
@@ -11,11 +12,14 @@ namespace shaker.domain.Channels
 {
     public class MessagesDomain : IMessagesDomain
     {
+        private IConnectedUserAccessor _connectedUserAccessor;
         private IRepository<Message> _repository;
 
         public MessagesDomain(
+            IConnectedUserAccessor connectedUserAccessor,
             IRepository<Message> repository)
         {
+            _connectedUserAccessor = connectedUserAccessor;
             _repository = repository;
         }
 
@@ -25,17 +29,19 @@ namespace shaker.domain.Channels
             ch.Id = dto.ChannelId;
             Message entity = new Message() {
                 Channel = ch,
-                User = new User(), // TODO Thread.User
+                User = new User() { Id = _connectedUserAccessor.GetId() },
                 Content = dto.Content,
                 Creation = DateTime.UtcNow.Date
             };
 
-            dto.Id = _repository.Add(entity);
+            entity.Id = _repository.Add(entity);
+
+            dto = ToMessageDto(entity);
 
             return dto;
         }
 
-        public bool DeleteOne(int id)
+        public bool DeleteOne(string id)
         {
             Message msg = _repository.Get(id);
 
@@ -44,7 +50,7 @@ namespace shaker.domain.Channels
             return _repository.Remove(msg);
         }
 
-        public bool DeleteAll(int channelId)
+        public bool DeleteAll(string channelId)
         {
             IEnumerable<Message> msgs = _repository.GetAll(m => m.Channel.Id == channelId);
 
@@ -57,7 +63,7 @@ namespace shaker.domain.Channels
             return state;
         }
 
-        public IEnumerable<MessageDto> GetAll(int channelId)
+        public IEnumerable<MessageDto> GetAll(string channelId)
         {
             return  _repository.GetAll(ToMessageDtoSb(), m => m.Channel.Id == channelId);
         }
@@ -65,6 +71,18 @@ namespace shaker.domain.Channels
         private static Expression<Func<Message, MessageDto>> ToMessageDtoSb()
         {
             return msg => new MessageDto
+            {
+                Id = msg.Id,
+                ChannelId = msg.Channel.Id,
+                UserId = msg.User.Id,
+                Content = msg.Content,
+                Creation = msg.Creation
+            };
+        }
+
+        private static MessageDto ToMessageDto(Message msg)
+        {
+            return new MessageDto
             {
                 Id = msg.Id,
                 ChannelId = msg.Channel.Id,

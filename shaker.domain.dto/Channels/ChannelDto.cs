@@ -5,7 +5,7 @@ namespace shaker.domain.dto.Channels
 {
     public class ChannelDto : IBaseDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public string Name { get; set; }
 

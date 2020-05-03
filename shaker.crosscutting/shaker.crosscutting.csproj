@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.3" />
-    <PackageReference Include="AspNetCore.Identity.LiteDB" Version="2.7.0" />
+    <Folder Include="Accessors\" />
   </ItemGroup>
 </Project>

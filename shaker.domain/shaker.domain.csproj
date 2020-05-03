@@ -9,6 +9,7 @@
     <ProjectReference Include="..\shaker.data.entity\shaker.data.entity.csproj" />
     <ProjectReference Include="..\shaker.domain.dto\shaker.domain.dto.csproj" />
     <ProjectReference Include="..\shaker.data\shaker.data.csproj" />
+    <ProjectReference Include="..\shaker.crosscutting\shaker.crosscutting.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Posts\" />

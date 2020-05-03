@@ -1,11 +1,18 @@
 ﻿using System;
+using LiteDB;
 using shaker.data.core;
 
 namespace shaker.data.entity
 {
     public class Post : IBaseEntity
     {
-        public int Id { get; set; }
+        public Post()
+        {
+            Id = ObjectId.NewObjectId().ToString();
+        }
+
+        [BsonId]
+        public string Id { get; set; }
 
         public string Description { get; set; }
 

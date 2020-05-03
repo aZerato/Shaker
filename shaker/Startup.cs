@@ -1,10 +1,15 @@
 using System;
+using System.Collections.Generic;
+using MessagePack;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using shaker.Areas.Hubs;
 using shaker.data.entity.Users;
 
 namespace shaker
@@ -21,6 +26,15 @@ namespace shaker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy", builder =>
+                    builder.WithOrigins("http://localhost:4200")
+                           .AllowAnyMethod()
+                           .AllowAnyHeader()
+                           .AllowCredentials());
+            });
+
             services.AddControllersWithViews();
 
             ConfigureServicesIoC(services);
@@ -28,16 +42,27 @@ namespace shaker
             services.AddRazorPages()
                 .AddRazorRuntimeCompilation();
 
+            services.AddSignalR(o => {
+                    o.EnableDetailedErrors = true;
+                })
+                .AddMessagePackProtocol(options =>
+                 {
+                     options.FormatterResolvers = new List<IFormatterResolver>()
+                    {
+                        MessagePack.Resolvers.StandardResolver.Instance
+                    };
+                 });
 
             ConfigureAuth(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services, UserManager<User> userManager)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                ConfigureAuthApp(app, userManager);
             }
             else
             {
@@ -46,16 +71,12 @@ namespace shaker
                 app.UseHsts();
             }
 
+            app.UseCors("CorsPolicy");
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
-
-            // global cors policy
-            app.UseCors(x => x
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -69,9 +90,9 @@ namespace shaker
                 endpoints.MapControllerRoute(
                     name: "api",
                     pattern: "api/{controller=Home}/{action=Index}/{id?}");
-            });
 
-            ConfigureWebSocket(app, env, services);
+                endpoints.MapHub<ChannelHub>(ChannelHub.Path);
+            });
         }
     }
 }

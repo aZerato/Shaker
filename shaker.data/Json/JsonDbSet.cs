@@ -18,7 +18,12 @@ namespace shaker.data.Json
             _collection = _liteDatabase.GetCollection<TEntity>(typeof(TEntity).Name);
         }
 
-        public int Add(TEntity entity)
+        public bool EnsureUniqueIndex(string propertyName)
+        {
+            return _collection.EnsureIndex(propertyName, true);
+        }
+
+        public string Add(TEntity entity)
         {
             return _collection.Insert(entity);
         }
@@ -38,7 +43,7 @@ namespace shaker.data.Json
             return _collection.Delete(entity.Id);
         }
 
-        public TEntity Find(int id)
+        public TEntity Find(string id)
         {
             return _collection.FindById(id);
         }

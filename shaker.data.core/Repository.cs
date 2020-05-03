@@ -41,10 +41,19 @@ namespace shaker.data.core
         #region ---- Repository Implementation ----
 
         /// <summary>
+        /// <see cref="IRepository{TEntity}.EnsureUniqueIndex(propertyName)"/> 
+        /// </summary>
+        /// <param name="propertyName"><see cref="IRepository{TEntity}.EnsureUniqueIndex(propertyName)"/> </param>
+        public virtual bool EnsureUniqueIndex(string propertyName)
+        {
+            return _currentUoW.CreateSet<TEntity>().EnsureUniqueIndex(propertyName);
+        }
+
+        /// <summary>
         /// <see cref="IRepository{TEntity}.Add(TEntity)"/> 
         /// </summary>
         /// <param name="entity"><see cref="IRepository{TEntity}.Add(TEntity)"/> </param>
-        public virtual int Add(TEntity entity)
+        public virtual string Add(TEntity entity)
         {
             return _currentUoW.CreateSet<TEntity>().Add(entity);
         }
@@ -88,9 +97,20 @@ namespace shaker.data.core
         /// </summary>
         /// <param name="id"><see cref="IRepository{TEntity}.Get(int)"/></param>
         /// <returns></returns>
-        public virtual TEntity Get(int id)
+        public virtual TEntity Get(string id)
         {
             return _currentUoW.CreateSet<TEntity>().Find(id);
+        }
+
+        /// <summary>
+        /// <see cref="IRepository{TEntity}.Get(Expression)"/>
+        /// </summary>
+        /// <typeparam name="TResult"><see cref="IRepository{TEntity}.Get(Expression)"/></typeparam>
+        /// <param name="predicate"><see cref="IRepository{TEntity}.Get(Expression)"/></param>
+        /// <returns><see cref="IRepository{TEntity}.Get(Expression)"/></returns>
+        public virtual TEntity Get(Expression<Func<TEntity, bool>> predicate)
+        {
+            return _currentUoW.CreateSet<TEntity>().Where(predicate).SingleOrDefault();
         }
 
         /// <summary>

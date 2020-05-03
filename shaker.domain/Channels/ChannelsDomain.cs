@@ -35,7 +35,7 @@ namespace shaker.domain.Posts
             return dto;
         }
 
-        public bool Delete(int id)
+        public bool Delete(string id)
         {
             Channel ch = _channelRepository.Get(id);
 
@@ -44,13 +44,13 @@ namespace shaker.domain.Posts
             return _channelRepository.Remove(ch) && _messagesDomain.DeleteAll(id);
         }
 
-        public ChannelDto Get(int id, bool withMessages)
+        public ChannelDto Get(string id, bool withMessages)
         {
             Channel entity = _channelRepository.Get(id);
             return ToChannelDto(entity, true);
         }
 
-        public ChannelDto Update(int id, ChannelDto dto)
+        public ChannelDto Update(string id, ChannelDto dto)
         {
             Channel entity = _channelRepository.Get(id);
 

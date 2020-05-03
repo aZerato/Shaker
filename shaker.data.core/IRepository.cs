@@ -11,10 +11,16 @@ namespace shaker.data.core
         where TEntity : IBaseEntity 
     {
         /// <summary>
+        /// Ensure Unique Index.
+        /// </summary>
+        /// <param name="propertyName">The property to check.</param>
+        bool EnsureUniqueIndex(string propertyName);
+
+        /// <summary>
         /// Add an entity to context.
         /// </summary>
         /// <param name="entity">The entity object.</param>
-        int Add(TEntity entity);
+        string Add(TEntity entity);
 
         /// <summary>
         /// Remove an entity to context.
@@ -33,7 +39,15 @@ namespace shaker.data.core
         /// </summary>
         /// <param name="id">The entity id.</param>
         /// <returns>Expected entity.</returns>
-        TEntity Get(int id);
+        TEntity Get(string id);
+
+        /// <summary>
+        /// Get entity from context.
+        /// </summary>
+        /// <typeparam name="TResult">Expected return object.</typeparam>
+        /// <param name="predicate">Custom filter expression.</param>
+        /// <returns>Expected entity.</returns>
+        TEntity Get(Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
         /// Get entities from context.

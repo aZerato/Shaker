@@ -20,15 +20,17 @@
     <ProjectReference Include="..\shaker.data\shaker.data.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
+    <ProjectReference Include="..\shaker.crosscutting\shaker.crosscutting.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\Posts\" />
     <Folder Include="Views\Blog\" />
-    <Folder Include="Areas\ChannelsArea\" />
-    <Folder Include="Areas\ChannelsArea\Controllers\" />
-    <Folder Include="Areas\UsersArea\" />
-    <Folder Include="Areas\UsersArea\Controllers\" />
-    <Folder Include="Areas\UsersArea\Auth\" />
+    <Folder Include="Areas\Api\" />
+    <Folder Include="Areas\Api\Controllers\" />
+    <Folder Include="Areas\Hubs\" />
+    <Folder Include="Areas\Api\Auth\" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="bd.json" />
@@ -39,5 +41,7 @@
     <PackageReference Include="bootstrap" Version="4.4.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="3.1.3" />
   </ItemGroup>
 </Project>

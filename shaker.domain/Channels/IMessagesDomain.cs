@@ -7,10 +7,10 @@ namespace shaker.domain.Channels
     {
         MessageDto Create(MessageDto message);
 
-        bool DeleteOne(int id);
+        bool DeleteOne(string id);
 
-        bool DeleteAll(int channelId);
+        bool DeleteAll(string channelId);
 
-        IEnumerable<MessageDto> GetAll(int channelId);
+        IEnumerable<MessageDto> GetAll(string channelId);
     }
 }
