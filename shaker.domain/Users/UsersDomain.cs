@@ -1,117 +1,103 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading;
 using Microsoft.AspNetCore.Identity;
 using shaker.data.core;
 using shaker.data.entity.Users;
+using shaker.crosscutting.Exceptions;
 
 namespace shaker.domain.Users
 {
     public class UsersDomain : IUsersDomain
     {
-        private readonly UserStore _userStore;
+        private readonly UserManager<User> _userManager;
         private readonly IRepository<User> _usersRepository;
-        private readonly IPasswordHasher<AuthDto> _passwordHasher;
 
         public UsersDomain(
-            IUserStore<User> userStore,
-            IRepository<User> usersRepository,
-            IPasswordHasher<AuthDto> passwordHasher)
+            UserManager<User> userManager,
+            IRepository<User> usersRepository)
         {
-            _userStore = (UserStore)userStore;
+            _userManager = userManager;
             _usersRepository = usersRepository;
-            _passwordHasher = passwordHasher;
         }
 
         public UserDto IsAuthenticated(AuthDto dto)
         {
-            CancellationToken cancelToken = new CancellationToken();
+            User matchingUser = _userManager.FindByNameAsync(dto.UserName.ToUpperInvariant()).Result;
 
-            User matchingUser = _userStore.FindByNameAsync(dto.UserName.ToUpperInvariant(), cancelToken).Result;
-
-            if (matchingUser == null) return null; // user not exists
-
-            PasswordVerificationResult pwdResult = _passwordHasher.VerifyHashedPassword(dto, matchingUser.PasswordHash, dto.Password);
-
-            if (pwdResult == PasswordVerificationResult.Failed)
+            if (matchingUser == null)
             {
-                _userStore.IncrementAccessFailedCountAsync(matchingUser, cancelToken);
+                throw new DomainException("User doesn't exists");
+            }
+
+            bool pwdResult = _userManager.CheckPasswordAsync(matchingUser, dto.Password).Result;
+
+            if (!pwdResult)
+            {
+                _userManager.AccessFailedAsync(matchingUser);
 
                 // manage lockout.
 
-                return null;
+                throw new DomainException("Invalid combinaison");
             }
 
-            if (pwdResult == PasswordVerificationResult.SuccessRehashNeeded)
-            {
-                string hashedPwd = _passwordHasher.HashPassword(dto, dto.Password);
+            _userManager.ResetAccessFailedCountAsync(matchingUser);
 
-                _userStore.SetPasswordHashAsync(matchingUser, hashedPwd, cancelToken);
-            }
-
-            _userStore.ResetAccessFailedCountAsync(matchingUser, cancelToken);
-
-            _userStore.UpdateAsync(matchingUser, cancelToken);
+            _userManager.UpdateAsync(matchingUser);
 
             return ToUserDto(matchingUser);
         }
 
         public UserDto Create(AuthDto dto)
         {
-            CancellationToken cancelToken = new CancellationToken();
+            User matchingUser = _userManager.FindByNameAsync(dto.UserName).Result;
 
-            string normalizedUsername = dto.UserName.ToUpperInvariant();
-
-            User matchingUser = _userStore.FindByNameAsync(normalizedUsername, cancelToken).Result;
-
-            if (matchingUser != null) return null; // user exists
-            
-            string hashedPwd = _passwordHasher.HashPassword(dto, dto.Password);
+            if (matchingUser != null)
+            {
+                throw new DomainException("User already exists");
+            }
 
             User user = new User();
             user.UserName = dto.UserName;
-            user.NormalizedUserName = normalizedUsername;
             // user.Email = dto.UserName; // + email confirmation !
-            user.PasswordHash = hashedPwd;
 
-            IdentityResult result = _userStore.CreateAsync(user, cancelToken).Result;
+            IdentityResult result = _userManager.CreateAsync(user, dto.Password).Result;
 
-            UserDto userDto = null;
-            if (result == IdentityResult.Success)
+            // messages password validation
+            if (result != IdentityResult.Success)
             {
-                user = _userStore.FindByNameAsync(user.NormalizedUserName, cancelToken).Result;
-                userDto = ToUserDto(user);
+                string errors = string.Empty;
+
+                foreach(var er in result.Errors)
+                {
+                    errors += $" {er.Description}";
+                }
+
+                throw new DomainException(errors);
             }
 
-            return userDto;
+            return ToUserDto(user);
         }
 
         public UserDto Get(string id)
         {
-            CancellationToken cancelToken = new CancellationToken();
-
-            User user = _userStore.FindByIdAsync(id, cancelToken).Result;
+            User user = _userManager.FindByIdAsync(id).Result;
 
             return ToUserDto(user);
         }
 
         public bool Delete(string id)
         {
-            CancellationToken cancelToken = new CancellationToken();
+            User user = _userManager.FindByIdAsync(id).Result;
 
-            User user = _userStore.FindByIdAsync(id, cancelToken).Result;
-
-            IdentityResult result = _userStore.DeleteAsync(user, cancelToken).Result;
+            IdentityResult result = _userManager.DeleteAsync(user).Result;
 
             return result == IdentityResult.Success ? true : false;
         }
 
         public bool Update(UserDto dto)
         {
-            CancellationToken cancelToken = new CancellationToken();
-
-            User user = _userStore.FindByIdAsync(dto.Id, cancelToken).Result;
+            User user = _userManager.FindByIdAsync(dto.Id).Result;
 
             if (user == null) return false;
 
@@ -119,7 +105,7 @@ namespace shaker.domain.Users
             user.NormalizedUserName = dto.UserName.ToUpperInvariant();
             user.Email = dto.Email;
 
-            IdentityResult result = _userStore.UpdateAsync(user, cancelToken).Result;
+            IdentityResult result = _userManager.UpdateAsync(user).Result;
 
             return result == IdentityResult.Success ? true : false;
         }

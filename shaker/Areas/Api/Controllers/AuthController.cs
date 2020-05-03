@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using shaker.Areas.Api.Auth;
+using shaker.crosscutting.Exceptions;
 using shaker.domain.Users;
 
 namespace shaker.Areas.Api.Controllers
@@ -10,6 +12,8 @@ namespace shaker.Areas.Api.Controllers
         private readonly IUsersDomain _usersDomain;
         private readonly IJwtAuth _jwtAuth;
         private readonly ILogger<AuthController> _logger;
+
+        public const string DefaultErrorMessage = "Oops, we encountered an error. Please try again !";
 
         public AuthController(
             IUsersDomain usersDomain,
@@ -25,27 +29,55 @@ namespace shaker.Areas.Api.Controllers
         [HttpPost]
         public IActionResult Authenticate([FromBody]AuthDto dto)
         {
-            UserDto userDto = _usersDomain.IsAuthenticated(dto);
+            try
+            {
+                _logger.LogTrace($"Autentication attempts for {dto.UserName}");
 
-            if (userDto == null)
-                return BadRequest(new { message = "Username or password is incorrect" });
+                UserDto userDto = _usersDomain.IsAuthenticated(dto);
+                    
+                userDto = _jwtAuth.GenerateToken(userDto);
 
-            userDto = _jwtAuth.GenerateToken(userDto);
+                return Ok(userDto);
+            }
+            catch(DomainException ex)
+            {
+                _logger.LogError(ex.Message);
 
-            return Ok(userDto);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch(Exception ex)
+            {
+                _logger.LogCritical(ex.Message);
+
+                return BadRequest(new { message = DefaultErrorMessage });
+            }
         }
 
         [HttpPost]
         public IActionResult Create([FromBody]AuthDto dto)
         {
-            UserDto userDto = _usersDomain.Create(dto);
+            try
+            {
+                _logger.LogError($"Creation attempts for {dto.UserName}");
 
-            if (userDto == null)
-                return BadRequest(new { message = "An issue occured ! :(" });
+                UserDto userDto = _usersDomain.Create(dto);
 
-            userDto = _jwtAuth.GenerateToken(userDto);
+                userDto = _jwtAuth.GenerateToken(userDto);
 
-            return Ok(userDto);
+                return Ok(userDto);
+            }
+            catch (DomainException ex)
+            {
+                _logger.LogError(ex.Message);
+
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex.Message);
+
+                return BadRequest(new { message = DefaultErrorMessage });
+            }
         }
     }
 }

@@ -6,5 +6,6 @@
 
   <ItemGroup>
     <Folder Include="Accessors\" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
 </Project>
