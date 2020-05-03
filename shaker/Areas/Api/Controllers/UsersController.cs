@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using shaker.domain.Users;
+using shaker.domain.dto.Users;
 
 namespace shaker.Areas.Api.Controllers
 {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using shaker.domain.dto.Users;
 
 namespace shaker.domain.Users
 {

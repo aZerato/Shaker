@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using shaker.data.core;
 using shaker.data.entity.Users;
 using shaker.crosscutting.Exceptions;
+using shaker.domain.dto.Users;
 
 namespace shaker.domain.Users
 {

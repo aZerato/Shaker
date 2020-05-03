@@ -39,7 +39,6 @@ namespace shaker
             services.AddTransient<IRoleStore<Role>, RoleStore>();
             services.AddTransient<IRepository<User>, Repository<User>>();
             services.AddTransient<IRepository<Role>, Repository<Role>>();
-            services.AddTransient<IPasswordHasher<AuthDto>, PasswordHasher<AuthDto>>();
             services.AddTransient<IUsersDomain, UsersDomain>();
         }
     }

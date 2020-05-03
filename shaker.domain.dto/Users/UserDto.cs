@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace shaker.domain.Users
+﻿namespace shaker.domain.dto.Users
 {
     public class UserDto : IBaseDto
     {

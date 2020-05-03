@@ -3,7 +3,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using shaker.domain.Posts;
-using shaker.domain.dto;
 using shaker.Models.Posts;
 using System;
 
@@ -43,50 +42,6 @@ namespace shaker.Controllers
             }
 
             return View(list);
-        }
-
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Create(PostCreateModel post)
-        {
-            try
-            {
-                _postsDomain.Create(new PostDto
-                {
-                    Content = post.Content,
-                    Description = post.Description
-                });
-
-                return new RedirectToActionResult("Index", "Blog", null);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = ex.Message;
-                _logger.LogError(ex.Message);
-            }
-
-            return View();
-        }
-
-        public IActionResult Delete(string id)
-        {
-            try
-            {
-                _postsDomain.Delete(id);
-
-                return new RedirectToActionResult("Index", "Blog", null);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = ex.Message;
-                _logger.LogError(ex.Message);
-            }
-
-            return View();
         }
     }
 }

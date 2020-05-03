@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using shaker.Areas.Api.Auth;
 using shaker.crosscutting.Exceptions;
 using shaker.domain.Users;
+using shaker.domain.dto.Users;
 
 namespace shaker.Areas.Api.Controllers
 {

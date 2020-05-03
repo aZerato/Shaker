@@ -83,13 +83,19 @@ namespace shaker
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapAreaControllerRoute(
+                    name: "admin_areas",
+                    areaName: "admin",
+                    pattern: "admin/{controller}/{action}/{id?}",
+                    defaults: new { controller = "AuthAdmin", action = "Login" });
 
                 endpoints.MapControllerRoute(
                     name: "api",
-                    pattern: "api/{controller=Home}/{action=Index}/{id?}");
+                    pattern: "api/{controller=Auth}/{action=Authenticate}/{id?}");
+
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
 
                 endpoints.MapHub<ChannelHub>(ChannelHub.Path);
             });

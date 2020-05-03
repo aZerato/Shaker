@@ -89,6 +89,18 @@ namespace shaker
                     }
                 };
             });
+
+            // cookie auth
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+                options.LoginPath = "/Admin/Auth/Login";
+                options.AccessDeniedPath = "/Home/AccessDenied";
+                options.SlidingExpiration = true;
+            });
         }
 
         public void ConfigureAuthApp(IApplicationBuilder app, UserManager<User> userManager)

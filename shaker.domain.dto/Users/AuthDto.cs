@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace shaker.domain.Users
+namespace shaker.domain.dto.Users
 {
     public class AuthDto
     {
@@ -9,5 +9,7 @@ namespace shaker.domain.Users
 
         [Required]
         public string Password { get; set; }
+
+        public bool RememberMe { get; set; }
     }
 }
