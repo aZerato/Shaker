@@ -34,6 +34,7 @@ namespace shaker
                 provider => provider.GetService<IHttpContextAccessor>().HttpContext.User);
             services.AddTransient<IConnectedUserAccessor, ConnectedUserAccessor>();
             services.AddTransient<IJwtAuth, JwtAuth>();
+            services.AddTransient<UserManager<User>>();
             services.AddTransient<IUserStore<User>, UserStore>();
             services.AddTransient<IRoleStore<Role>, RoleStore>();
             services.AddTransient<IRepository<User>, Repository<User>>();

@@ -1,7 +1,15 @@
 # Shaker
  ---
 
-Dotnet Core 3 application
+Backend (check [Shaker-angular](https://github.com/aZerato/shaker-angular) for the frontend)
 
-[LiteDB](https://github.com/mbdavid/LiteDB) implementation
-WebSocket middleware: with sample use for a chat
+- Dotnet Core 3 application
+
+- [LiteDB](https://github.com/mbdavid/LiteDB) implementation
+
+- SignalR : WebSocket (MessagePack)
+
+- Identity implementation (with liteDB)
+
+- Jwt Token Bearer (works with SignalR & Api parts)
+
