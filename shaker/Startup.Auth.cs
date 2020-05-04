@@ -1,27 +1,17 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using shaker.Areas.Hubs;
+using shaker.crosscutting;
 using shaker.data.entity.Users;
-using shaker.domain.Users;
 
 namespace shaker
 {
-    public class AppSettings
-    {
-        public string Secret { get; set; }
-    }
-
     public partial class Startup
     {
         public void ConfigureAuth(IServiceCollection services)

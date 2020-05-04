@@ -15,5 +15,6 @@
     <Folder Include="Posts\" />
     <Folder Include="Channels\" />
     <Folder Include="Users\" />
+    <Folder Include="Users\Identity\" />
   </ItemGroup>
 </Project>

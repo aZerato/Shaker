@@ -30,12 +30,12 @@
     <Folder Include="Areas\Api\" />
     <Folder Include="Areas\Api\Controllers\" />
     <Folder Include="Areas\Hubs\" />
-    <Folder Include="Areas\Api\Auth\" />
     <Folder Include="Areas\Admin\" />
     <Folder Include="Areas\Admin\Controllers\" />
     <Folder Include="Areas\Admin\Views\" />
     <Folder Include="Areas\Admin\Views\BlogAdmin\" />
     <Folder Include="Areas\Admin\Views\AuthAdmin\" />
+    <Folder Include="Areas\Api\Auth\" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="bd.json" />

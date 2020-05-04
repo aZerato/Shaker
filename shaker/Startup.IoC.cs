@@ -12,6 +12,7 @@ using shaker.data.Json;
 using shaker.domain.Channels;
 using shaker.domain.Posts;
 using shaker.domain.Users;
+using shaker.domain.Users.Identity;
 
 namespace shaker
 {

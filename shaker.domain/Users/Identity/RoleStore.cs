@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using shaker.data.core;
 using shaker.data.entity.Users;
 
-namespace shaker.domain.Users
+namespace shaker.domain.Users.Identity
 {
     public class RoleStore : IRoleStore<Role>
     {
