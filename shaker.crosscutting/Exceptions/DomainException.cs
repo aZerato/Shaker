@@ -1,9 +1,9 @@
 ﻿using System;
 namespace shaker.crosscutting.Exceptions
 {
-    public class DomainException : Exception
+    public class ShakerDomainException : Exception
     {
-        public DomainException(string message)
+        public ShakerDomainException(string message)
             : base(message)
         {
         }

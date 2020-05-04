@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using shaker.crosscutting;
+using shaker.crosscutting.Configuration;
 using shaker.domain.dto.Users;
 
 namespace shaker.Areas.Api.Auth

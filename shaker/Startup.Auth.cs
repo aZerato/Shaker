@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using shaker.crosscutting;
+using shaker.crosscutting.Configuration;
 using shaker.data.entity.Users;
 
 namespace shaker

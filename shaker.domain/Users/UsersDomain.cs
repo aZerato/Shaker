@@ -6,65 +6,81 @@ using shaker.data.core;
 using shaker.data.entity.Users;
 using shaker.crosscutting.Exceptions;
 using shaker.domain.dto.Users;
+using shaker.crosscutting.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace shaker.domain.Users
 {
     public class UsersDomain : IUsersDomain
     {
+        private readonly ILogger<UsersDomain> _logger;
+        private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly IRepository<User> _usersRepository;
 
         public UsersDomain(
+            ILogger<UsersDomain> logger,
+            SignInManager<User> signInManager,
             UserManager<User> userManager,
             IRepository<User> usersRepository)
         {
+            _logger = logger;
+            _signInManager = signInManager;
             _userManager = userManager;
             _usersRepository = usersRepository;
         }
 
-        public UserDto IsAuthenticated(AuthDto dto)
+        public UserDto Authenticate(AuthDto dto)
         {
-            User matchingUser = _userManager.FindByNameAsync(dto.UserName.ToUpperInvariant()).Result;
+            SignInResult result = _signInManager.PasswordSignInAsync(dto.UserName, dto.Password, dto.RememberMe, true).Result;
 
-            if (matchingUser == null)
+            if(result != SignInResult.Success)
             {
-                throw new DomainException("User doesn't exists");
+                string errorLog = string.Empty;
+                string errorPresentation = string.Empty;
+
+                if (result.IsLockedOut)
+                {
+                    errorLog = MessagesGetter.Get(ErrorLogMessages.LockoutLogErrorMessage, dto.UserName);
+                    errorPresentation = MessagesGetter.Get(ErrorPresentationMessages.LockoutErrorMessage);
+                }
+
+                if (result.IsNotAllowed)
+                {
+                    errorLog = MessagesGetter.Get(ErrorLogMessages.NotAllowedLogErrorMessage, dto.UserName);
+                    errorPresentation = MessagesGetter.Get(ErrorPresentationMessages.NotAllowedErrorMessage);
+                }
+
+                if (result.RequiresTwoFactor)
+                {
+                    errorLog = MessagesGetter.Get(ErrorLogMessages.RequiresTwoFactorLogErrorMessage, dto.UserName);
+                    errorPresentation = MessagesGetter.Get(ErrorPresentationMessages.RequiresTwoFactorErrorMessage);
+                }
+
+                if (result == SignInResult.Failed)
+                {
+                    errorLog = MessagesGetter.Get(ErrorLogMessages.FailedSignInLogErrorMessage, dto.UserName);
+                    errorPresentation = MessagesGetter.Get(ErrorPresentationMessages.FailedSignInErrorMessage);
+                }
+
+                _logger.LogError(errorLog);
+
+                throw new ShakerDomainException(errorPresentation);
             }
 
-            bool pwdResult = _userManager.CheckPasswordAsync(matchingUser, dto.Password).Result;
+            User user = _userManager.FindByNameAsync(dto.UserName.ToUpperInvariant()).Result;
 
-            if (!pwdResult)
-            {
-                _userManager.AccessFailedAsync(matchingUser);
-
-                // manage lockout.
-
-                throw new DomainException("Invalid combinaison");
-            }
-
-            _userManager.ResetAccessFailedCountAsync(matchingUser);
-
-            _userManager.UpdateAsync(matchingUser);
-
-            return ToUserDto(matchingUser);
+            return ToUserDto(user);
         }
 
-        public UserDto Create(AuthDto dto)
+        public UserDto Create(SignInDto dto)
         {
-            User matchingUser = _userManager.FindByNameAsync(dto.UserName).Result;
-
-            if (matchingUser != null)
-            {
-                throw new DomainException("User already exists");
-            }
-
             User user = new User();
             user.UserName = dto.UserName;
-            // user.Email = dto.UserName; // + email confirmation !
+            user.Email = dto.Email; // Todo + email confirmation !
 
             IdentityResult result = _userManager.CreateAsync(user, dto.Password).Result;
 
-            // messages password validation
             if (result != IdentityResult.Success)
             {
                 string errors = string.Empty;
@@ -74,7 +90,7 @@ namespace shaker.domain.Users
                     errors += $" {er.Description}";
                 }
 
-                throw new DomainException(errors);
+                throw new ShakerDomainException(errors);
             }
 
             return ToUserDto(user);

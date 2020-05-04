@@ -7,7 +7,6 @@ using shaker.domain.dto;
 using shaker.Models.Posts;
 using System;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace shaker.Areas.Admin.Controllers
 {

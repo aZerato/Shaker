@@ -1,4 +1,4 @@
-﻿namespace shaker.crosscutting
+﻿namespace shaker.crosscutting.Configuration
 {
     /// <summary>
     /// AppSettings class used for sharing data from appsettings.json
