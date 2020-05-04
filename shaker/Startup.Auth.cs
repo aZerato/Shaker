@@ -41,19 +41,20 @@ namespace shaker
                 })
                 .AddDefaultTokenProviders();
 
+            // cookie auth
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.Name = "shaker";
+                options.LoginPath = new PathString("/admin/auth");
+                options.AccessDeniedPath = new PathString("/Home/AccessDenied");
+                options.SlidingExpiration = true;
+            });
+
             // Jwt Secret Key
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.Cookie.Name = "shaker";
-                options.LoginPath = new PathString("/admin/auth");
-                options.AccessDeniedPath = "/Home/AccessDenied";
-                options.SlidingExpiration = true;
-            });
 
             services.AddAuthentication()
                 // configure jwt authentication
