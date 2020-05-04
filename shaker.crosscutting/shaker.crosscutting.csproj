@@ -7,5 +7,8 @@
   <ItemGroup>
     <Folder Include="Accessors\" />
     <Folder Include="Exceptions\" />
+    <Folder Include="Messages\" />
+    <Folder Include="Configuration\" />
+    <Folder Include="Utils\" />
   </ItemGroup>
 </Project>

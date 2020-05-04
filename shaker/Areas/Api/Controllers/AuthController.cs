@@ -4,6 +4,10 @@ using Microsoft.Extensions.Logging;
 using shaker.Areas.Api.Auth;
 using shaker.crosscutting.Exceptions;
 using shaker.domain.Users;
+using shaker.domain.dto.Users;
+using shaker.crosscutting.Messages;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace shaker.Areas.Api.Controllers
 {
@@ -12,8 +16,6 @@ namespace shaker.Areas.Api.Controllers
         private readonly IUsersDomain _usersDomain;
         private readonly IJwtAuth _jwtAuth;
         private readonly ILogger<AuthController> _logger;
-
-        public const string DefaultErrorMessage = "Oops, we encountered an error. Please try again !";
 
         public AuthController(
             IUsersDomain usersDomain,
@@ -31,52 +33,62 @@ namespace shaker.Areas.Api.Controllers
         {
             try
             {
-                _logger.LogTrace($"Autentication attempts for {dto.UserName}");
-
-                UserDto userDto = _usersDomain.IsAuthenticated(dto);
+                UserDto userDto = _usersDomain.Authenticate(dto);
                     
                 userDto = _jwtAuth.GenerateToken(userDto);
 
                 return Ok(userDto);
             }
-            catch(DomainException ex)
+            catch(ShakerDomainException ex)
             {
-                _logger.LogError(ex.Message);
-
                 return BadRequest(new { message = ex.Message });
             }
             catch(Exception ex)
             {
                 _logger.LogCritical(ex.Message);
 
-                return BadRequest(new { message = DefaultErrorMessage });
+                return BadRequest(new { message = MessagesGetter.Get(ErrorPresentationMessages.DefaultErrorMessage) });
             }
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody]AuthDto dto)
+        public IActionResult Create([FromBody]SignInDto dto)
         {
             try
             {
-                _logger.LogError($"Creation attempts for {dto.UserName}");
-
                 UserDto userDto = _usersDomain.Create(dto);
 
                 userDto = _jwtAuth.GenerateToken(userDto);
 
                 return Ok(userDto);
             }
-            catch (DomainException ex)
+            catch (ShakerDomainException ex)
             {
-                _logger.LogError(ex.Message);
-
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogCritical(ex.Message);
 
-                return BadRequest(new { message = DefaultErrorMessage });
+                return BadRequest(new { message = MessagesGetter.Get(ErrorPresentationMessages.DefaultErrorMessage) });
+            }
+        }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult Logout()
+        {
+            try
+            {
+                _usersDomain.Logout();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex.Message);
+
+                return BadRequest(new { message = MessagesGetter.Get(ErrorPresentationMessages.DefaultErrorMessage) });
             }
         }
     }

@@ -7,17 +7,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using shaker.Areas.Hubs;
+using shaker.crosscutting.Configuration;
 using shaker.data.entity.Users;
-using shaker.domain.Users;
 
 namespace shaker
 {
-    public class AppSettings
-    {
-        public string Secret { get; set; }
-    }
-
     public partial class Startup
     {
         public void ConfigureAuth(IServiceCollection services)
@@ -42,56 +36,61 @@ namespace shaker
                     // User settings.
                     options.User.AllowedUserNameCharacters =
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                    options.User.RequireUniqueEmail = false;
+                    options.User.RequireUniqueEmail = true;
                 })
-                .AddDefaultTokenProviders(); //phone and emi
+                .AddDefaultTokenProviders();
 
-            // configure jwt authentication
-            // configure strongly typed settings objects
+            // Jwt Secret Key
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
-
-            // configure jwt authentication
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
 
-                options.Events = new JwtBearerEvents
+            services.AddAuthentication()
+                // configure jwt authentication
+                .AddJwtBearer(options =>
                 {
-                    OnMessageReceived = context =>
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        var accessToken = context.Request.Query["access_token"];
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
 
-                        // If the request is for our hub...
-                        var path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/hub")))
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
                         {
-                            // Read the token out of the query string
-                            context.Token = accessToken;
+                            var accessToken = context.Request.Query["access_token"];
+
+                            // If the request is for our hub...
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                (path.StartsWithSegments("/hub")))
+                            {
+                                // Read the token out of the query string
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
                         }
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+                    };
+                })
+                // Cookie settings
+                .AddCookie(options =>
+                {
+                    
+                    options.Cookie.Name = "shaker";
+                    options.LoginPath = "/admin/auth";
+                    options.AccessDeniedPath = "/Home/AccessDenied";
+                    options.SlidingExpiration = true;
+                });
+
         }
 
-        public void ConfigureAuthApp(IApplicationBuilder app, UserManager<User> userManager)
+        public void CreateDefaultUser(UserManager<User> userManager)
         {
             // create default user
             if (userManager.FindByNameAsync("aze").Result == null)
@@ -102,6 +101,13 @@ namespace shaker
                     Email = "aze@shaker.com"
                 }, "&aZ(erato123").Result;
             }
+        }   
+
+        public void ConfigureAuth(IApplicationBuilder app)
+        {
+            app.UseCookiePolicy();
+            app.UseAuthentication();
+            app.UseAuthorization();
         }
     }
 }

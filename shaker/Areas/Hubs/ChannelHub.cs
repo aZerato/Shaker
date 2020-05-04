@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using System;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using shaker.crosscutting.Accessors;
+using shaker.domain.Channels;
+using shaker.domain.dto.Channels;
 
 namespace shaker.Areas.Hubs
 {
-    using Microsoft.AspNetCore.Authorization;
-    using shaker.crosscutting.Accessors;
-    using shaker.domain.Channels;
-    using shaker.domain.dto.Channels;
-
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ChannelHub : Hub
     {
         private readonly IConnectedUserAccessor _connectedUserAccessor;

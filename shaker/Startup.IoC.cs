@@ -12,6 +12,7 @@ using shaker.data.Json;
 using shaker.domain.Channels;
 using shaker.domain.Posts;
 using shaker.domain.Users;
+using shaker.domain.Users.Identity;
 
 namespace shaker
 {
@@ -39,7 +40,6 @@ namespace shaker
             services.AddTransient<IRoleStore<Role>, RoleStore>();
             services.AddTransient<IRepository<User>, Repository<User>>();
             services.AddTransient<IRepository<Role>, Repository<Role>>();
-            services.AddTransient<IPasswordHasher<AuthDto>, PasswordHasher<AuthDto>>();
             services.AddTransient<IUsersDomain, UsersDomain>();
         }
     }

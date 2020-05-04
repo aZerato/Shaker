@@ -61,8 +61,8 @@ namespace shaker
         {
             if (env.IsDevelopment())
             {
+                CreateDefaultUser(userManager);
                 app.UseDeveloperExceptionPage();
-                ConfigureAuthApp(app, userManager);
             }
             else
             {
@@ -71,25 +71,29 @@ namespace shaker
                 app.UseHsts();
             }
 
+            app.UseRouting();
+
+            ConfigureAuth(app);
+
             app.UseCors("CorsPolicy");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapAreaControllerRoute(
+                    name: "AdminArea",
+                    areaName: "Admin",
+                    pattern: "Admin/{controller}/{action}/{id?}");
+
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-
+                
                 endpoints.MapControllerRoute(
                     name: "api",
-                    pattern: "api/{controller=Home}/{action=Index}/{id?}");
+                    pattern: "api/{controller=Auth}/{action=Authenticate}/{id?}");
 
                 endpoints.MapHub<ChannelHub>(ChannelHub.Path);
             });

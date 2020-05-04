@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using shaker.domain.Users;
+using shaker.domain.dto.Users;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace shaker.Areas.Api.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     public class UsersController : Controller
     {
