@@ -27,11 +27,7 @@ Backend (check [Shaker-angular](https://github.com/aZerato/shaker-angular) for t
 
 > The data management layer
 
-- Use "module" conception : services interfaces with their implementation (Module : aggregates/services [DDD])
-
-- DTO : Data Transfer Object (sample: MyApp.Domain.DTO.SampleDataDTO).
-
-- The [Specification Pattern](https://github.com/jnicolau/NSpecifications) (soon).
+- DTO : Data Transfer Object (sample: shaker.domain.dto).
 
 - "Select Builder" : Thanks to LINQ you are able to create custom expression for return directly an DTO (sample: MyApp.Domain.SampleModule.Aggregates.SampleDataSelectBuilder).
 
@@ -41,10 +37,10 @@ Backend (check [Shaker-angular](https://github.com/aZerato/shaker-angular) for t
 
 - [LiteDB](https://github.com/mbdavid/LiteDB) implementation
 
-- The [Unit Of Work (UnitOfWork / UoW) Pattern](https://martinfowler.com/eaaCatalog/unitOfWork.html) add transactions for the resolution of concurrency problems (MyApp.Data.UnitOfWorkContext).
+- The [Unit Of Work (UnitOfWork / UoW) Pattern](https://martinfowler.com/eaaCatalog/unitOfWork.html) add transactions for the resolution of concurrency problems (shaker.data.core.IUnitOfWork).
 
 - The [Repository Pattern](https://msdn.microsoft.com/en-us/library/ff649690.aspx) add a layer between DbSet (return IQueryable) with UoW and the data used in "Domain" layer. 
-Queryable manipulation is sensible, a Repository return an Enumerable or an Entity. (MyApp.Data.Core.Repository && MyApp.Domain.Core.IRepository)
+Queryable manipulation is sensible, a Repository return an Enumerable or an Entity. (shaker.data.core.Repository)
 
 
 ## 04 - Infrastructure

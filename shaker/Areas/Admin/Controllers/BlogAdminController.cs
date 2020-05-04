@@ -7,11 +7,13 @@ using shaker.domain.dto;
 using shaker.Models.Posts;
 using System;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
-namespace shaker.Controllers
+namespace shaker.Areas.Admin.Controllers
 {
     [Authorize]
     [Area("Admin")]
+    [Route("~/admin/blog")]
     public class BlogAdminController : Controller
     {
         private readonly IPostsDomain _postsDomain;
@@ -25,6 +27,8 @@ namespace shaker.Controllers
             _postsDomain = postsDomain;
         }
 
+        [HttpGet]
+        [Route("~/admin/blog")]
         public IActionResult Index()
         {
             IList<PostListModel> list = new List<PostListModel>();
@@ -48,12 +52,14 @@ namespace shaker.Controllers
             return View(list);
         }
 
+        [Route("~/admin/blog/create")]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Route("~/admin/blog/create")]
         public IActionResult Create(PostCreateModel post)
         {
             try
@@ -75,6 +81,8 @@ namespace shaker.Controllers
             return View();
         }
 
+        [HttpDelete]
+        [Route("~/admin/blog/delete/{id}")]
         public IActionResult Delete(string id)
         {
             try
