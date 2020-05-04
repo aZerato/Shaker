@@ -7,6 +7,8 @@ namespace shaker.domain.Users
     {
         UserDto Authenticate(AuthDto dto);
 
+        void Logout();
+
         UserDto Create(SignInDto dto);
 
         bool Delete(string id);

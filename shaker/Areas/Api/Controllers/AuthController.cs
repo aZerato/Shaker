@@ -6,6 +6,8 @@ using shaker.crosscutting.Exceptions;
 using shaker.domain.Users;
 using shaker.domain.dto.Users;
 using shaker.crosscutting.Messages;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace shaker.Areas.Api.Controllers
 {
@@ -31,8 +33,6 @@ namespace shaker.Areas.Api.Controllers
         {
             try
             {
-                _logger.LogTrace($"Autentication attempts for {dto.UserName}");
-
                 UserDto userDto = _usersDomain.Authenticate(dto);
                     
                 userDto = _jwtAuth.GenerateToken(userDto);
@@ -56,8 +56,6 @@ namespace shaker.Areas.Api.Controllers
         {
             try
             {
-                _logger.LogError($"Creation attempts for {dto.UserName}");
-
                 UserDto userDto = _usersDomain.Create(dto);
 
                 userDto = _jwtAuth.GenerateToken(userDto);
@@ -67,6 +65,24 @@ namespace shaker.Areas.Api.Controllers
             catch (ShakerDomainException ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex.Message);
+
+                return BadRequest(new { message = MessagesGetter.Get(ErrorPresentationMessages.DefaultErrorMessage) });
+            }
+        }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult Logout()
+        {
+            try
+            {
+                _usersDomain.Logout();
+
+                return Ok();
             }
             catch (Exception ex)
             {

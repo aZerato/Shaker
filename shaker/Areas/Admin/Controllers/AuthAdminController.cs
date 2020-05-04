@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
@@ -64,6 +65,25 @@ namespace shaker.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
             catch(Exception ex)
+            {
+                _logger.LogCritical(ex.Message);
+                TempData.Add(TempDataErrorMessageKey, MessagesGetter.Get(ErrorPresentationMessages.DefaultErrorMessage));
+                return RedirectToAction("Index");
+            }
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("~/admin/logout")]
+        public IActionResult Logout()
+        {
+            try
+            {
+                _usersDomain.Logout();
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
             {
                 _logger.LogCritical(ex.Message);
                 TempData.Add(TempDataErrorMessageKey, MessagesGetter.Get(ErrorPresentationMessages.DefaultErrorMessage));

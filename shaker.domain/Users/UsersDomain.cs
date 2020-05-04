@@ -73,6 +73,11 @@ namespace shaker.domain.Users
             return ToUserDto(user);
         }
 
+        public void Logout()
+        {
+            _signInManager.SignOutAsync();
+        }
+
         public UserDto Create(SignInDto dto)
         {
             User user = new User();

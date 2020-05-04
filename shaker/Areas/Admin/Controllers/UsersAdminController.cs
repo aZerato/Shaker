@@ -6,7 +6,7 @@ using shaker.domain.Users;
 
 namespace shaker.Areas.Admin.Controllers
 {
-    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+    [Authorize]
     [Area("Admin")]
     [Route("~/admin/users/{action}")]
     public class UsersAdminController : Controller
