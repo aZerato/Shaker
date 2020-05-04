@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,6 +47,14 @@ namespace shaker
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.Name = "shaker";
+                options.LoginPath = new PathString("/admin/auth");
+                options.AccessDeniedPath = "/Home/AccessDenied";
+                options.SlidingExpiration = true;
+            });
+
             services.AddAuthentication()
                 // configure jwt authentication
                 .AddJwtBearer(options =>
@@ -77,15 +86,6 @@ namespace shaker
                             return Task.CompletedTask;
                         }
                     };
-                })
-                // Cookie settings
-                .AddCookie(options =>
-                {
-                    
-                    options.Cookie.Name = "shaker";
-                    options.LoginPath = "/admin/auth";
-                    options.AccessDeniedPath = "/Home/AccessDenied";
-                    options.SlidingExpiration = true;
                 });
 
         }

@@ -4,7 +4,8 @@
 <form class="form-signin"
       method="post"
       asp-controller="AuthAdmin"
-      asp-area="Admin">
+      asp-area="Admin"
+      asp-route-returnUrl="@ViewData["returnUrl"]">
 
     @if(TempData[AuthAdminController.TempDataErrorMessageKey] != null)
     {

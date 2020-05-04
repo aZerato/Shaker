@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -30,9 +31,11 @@ namespace shaker.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        [Route("~/admin/auth")]
-        public IActionResult Index()
+        [Route("~/admin/auth/{returnUrl?}")]
+        public IActionResult Index(string returnUrl = null)
         {
+            ViewData["returnUrl"] = returnUrl;
+
             ModelStateDictionary loginModelState = TempData[TempDataModelStateKey] as ModelStateDictionary;
             if (loginModelState != null)
             {
@@ -43,9 +46,9 @@ namespace shaker.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("~/admin/auth")]
+        [Route("~/admin/auth/{returnurl?}")]
         [ValidateAntiForgeryToken]
-        public IActionResult Index(AuthDto dto)
+        public IActionResult Index(AuthDto dto, string returnUrl = null)
         {
             try
             {
@@ -56,6 +59,13 @@ namespace shaker.Areas.Admin.Controllers
                 }
 
                 _usersDomain.Authenticate(dto);
+
+                if (!string.IsNullOrEmpty(returnUrl))
+                {
+                    returnUrl = HttpUtility.UrlDecode(returnUrl);
+                    if (Url.IsLocalUrl(returnUrl))
+                        return Redirect(returnUrl);
+                }
 
                 return RedirectToAction("Index", "BlogAdmin");
             }
