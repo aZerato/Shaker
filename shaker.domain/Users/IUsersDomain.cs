@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using shaker.domain.dto.Users;
 
 namespace shaker.domain.Users
 {
-    public interface IUsersDomain
+    public interface IUsersDomain : IDisposable
     {
         UserDto Authenticate(AuthDto dto);
 

@@ -12,7 +12,7 @@ namespace shaker.data.entity
         }
 
         [BsonId]
-        public string Id { get; set; }
+        public string Id { get; }
 
         public string Description { get; set; }
 

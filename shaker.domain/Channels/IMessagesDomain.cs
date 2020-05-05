@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using shaker.domain.dto.Channels;
 
 namespace shaker.domain.Channels
 {
-    public interface IMessagesDomain
+    public interface IMessagesDomain : IDisposable
     {
         MessageDto Create(MessageDto message);
 

@@ -1,4 +1,4 @@
-﻿using LiteDB;
+﻿using System;
 using shaker.data.core;
 using shaker.data.entity;
 using shaker.data.entity.Channels;
@@ -8,44 +8,59 @@ namespace shaker.data.Json
 {
     public class JsonUnitOfWork : IUnitOfWork
     {
-        private readonly LiteDatabase _liteDatabase;
+        private readonly IDbContext _jsonDbContext;
 
-        public JsonUnitOfWork(string path)
+        public JsonUnitOfWork(IDbContext jsonDbContext)
         {
-            _liteDatabase = new LiteDatabase(path);
+            _jsonDbContext = jsonDbContext;
+
+            Users = new Repository<User>(jsonDbContext.Users);
+            Roles = new Repository<Role>(jsonDbContext.Roles);
+
+            Posts = new Repository<Post>(jsonDbContext.Posts);
+            Messages = new Repository<Message>(jsonDbContext.Messages);
+            Channels = new Repository<Channel>(jsonDbContext.Channels);
         }
 
-        #region ---- properties ----
+        public IRepository<User> Users { get; }
+        public IRepository<Role> Roles { get; }
 
-        public JsonDbSet<User> Users { get; set; }
-        public JsonDbSet<Role> Roles { get; set; }
-
-        public JsonDbSet<Post> Posts { get; set; }
-        public JsonDbSet<Message> Messages { get; set; }
-        public JsonDbSet<Channel> Channels { get; set; }
-        
-
-        #endregion
+        public IRepository<Post> Posts { get; }
+        public IRepository<Message> Messages { get; }
+        public IRepository<Channel> Channels { get; }
 
         public void Commit()
         {
-            _liteDatabase.Commit();
-        }
-
-        public IDbSet<TEntity> CreateSet<TEntity>()
-            where TEntity : IBaseEntity
-        {
-            return new JsonDbSet<TEntity>(_liteDatabase);
-        }
-
-        public void Dispose()
-        {
-            _liteDatabase.Dispose();
+            _jsonDbContext.Commit();
         }
 
         public void RollbackChanges()
         {
-            _liteDatabase.Rollback();
+            _jsonDbContext.RollbackChanges();
         }
+
+
+        #region IDisposable Support
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _jsonDbContext.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

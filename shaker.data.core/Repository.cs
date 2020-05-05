@@ -14,9 +14,9 @@ namespace shaker.data.core
         #region ---- Fields ----
 
         /// <summary>
-        /// The current UoW.
+        /// The current DBSet.
         /// </summary>
-        private readonly IUnitOfWork _currentUoW;
+        private readonly IDbSet<TEntity> _dbSet;
 
         #endregion
 
@@ -25,15 +25,15 @@ namespace shaker.data.core
         /// <summary>
         /// Default Constructor.
         /// </summary>
-        /// <param name="unitOfWork"></param>
-        public Repository(IUnitOfWork unitOfWork)
+        /// <param name="dbSet"></param>
+        public Repository(IDbSet<TEntity> dbSet)
         {
-            if (unitOfWork == null)
+            if (dbSet == null)
             {
-                throw new ArgumentNullException("UoW");
+                throw new ArgumentNullException("dbSet");
             }
 
-            _currentUoW = unitOfWork;
+            _dbSet = dbSet;
         }
 
         #endregion
@@ -46,7 +46,7 @@ namespace shaker.data.core
         /// <param name="propertyName"><see cref="IRepository{TEntity}.EnsureUniqueIndex(propertyName)"/> </param>
         public virtual bool EnsureUniqueIndex(string propertyName)
         {
-            return _currentUoW.CreateSet<TEntity>().EnsureUniqueIndex(propertyName);
+            return _dbSet.EnsureUniqueIndex(propertyName);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace shaker.data.core
         /// <param name="entity"><see cref="IRepository{TEntity}.Add(TEntity)"/> </param>
         public virtual string Add(TEntity entity)
         {
-            return _currentUoW.CreateSet<TEntity>().Add(entity);
+            return _dbSet.Add(entity);
         }
 
         /// <summary>
@@ -64,15 +64,7 @@ namespace shaker.data.core
         /// <param name="entity"><see cref="IRepository{TEntity}.Remove(TEntity)"/></param>
         public virtual bool Remove(TEntity entity)
         {
-            bool state = false;
-            using (var uow = _currentUoW)
-            {
-                var oSet = uow.CreateSet<TEntity>();
-
-                oSet.Attach(entity);
-                state = oSet.Remove(entity);
-            }
-            return state;
+            return _dbSet.Remove(entity);
         }
 
         /// <summary>
@@ -81,15 +73,7 @@ namespace shaker.data.core
         /// <param name="entity"><see cref="IRepository{TEntity}.Update(TEntity)"/></param>
         public virtual bool Update(TEntity entity)
         {
-            bool state = false;
-            using (var uow = _currentUoW)
-            {
-                var oSet = uow.CreateSet<TEntity>();
-
-                oSet.Attach(entity);
-                state = oSet.Update(entity);
-            }
-            return state;
+            return _dbSet.Update(entity);
         }
 
         /// <summary>
@@ -99,7 +83,7 @@ namespace shaker.data.core
         /// <returns></returns>
         public virtual TEntity Get(string id)
         {
-            return _currentUoW.CreateSet<TEntity>().Find(id);
+            return _dbSet.Find(id);
         }
 
         /// <summary>
@@ -110,7 +94,7 @@ namespace shaker.data.core
         /// <returns><see cref="IRepository{TEntity}.Get(Expression)"/></returns>
         public virtual TEntity Get(Expression<Func<TEntity, bool>> predicate)
         {
-            return _currentUoW.CreateSet<TEntity>().Where(predicate).SingleOrDefault();
+            return _dbSet.Where(predicate).SingleOrDefault();
         }
 
         /// <summary>
@@ -119,7 +103,7 @@ namespace shaker.data.core
         /// <returns><see cref="IRepository{TEntity}.GetAll()"/></returns>
         public virtual IEnumerable<TEntity> GetAll()
         {
-            return _currentUoW.CreateSet<TEntity>().AsEnumerable();
+            return _dbSet.AsEnumerable();
         }
 
         /// <summary>
@@ -131,7 +115,7 @@ namespace shaker.data.core
         public virtual IEnumerable<TResult> GetAll<TResult>(Expression<Func<TEntity, TResult>> selectBuilder)
                 where TResult : IBaseEntity
         {
-            return _currentUoW.CreateSet<TEntity>().Select(selectBuilder).AsEnumerable();
+            return _dbSet.Select(selectBuilder);
         }
 
         /// <summary>
@@ -142,7 +126,7 @@ namespace shaker.data.core
         /// <returns><see cref="IRepository{TEntity}.GetAllAndCount(Expression)"/></returns>
         public virtual IEnumerable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate)
         {
-            return _currentUoW.CreateSet<TEntity>().Where(predicate);
+            return _dbSet.Where(predicate);
         }
 
         /// <summary>
@@ -156,7 +140,7 @@ namespace shaker.data.core
             Expression<Func<TEntity, bool>> predicate)
                 where TResult : IBaseEntity
         {
-            return _currentUoW.CreateSet<TEntity>().Where(selectBuilder, predicate);
+            return _dbSet.Where(selectBuilder, predicate);
         }
 
         /// <summary>
@@ -171,12 +155,12 @@ namespace shaker.data.core
             Expression<Func<TEntity, bool>> predicate)
                 where TResult : IBaseEntity
         {
-            var oSet = _currentUoW.CreateSet<TEntity>();
+            IEnumerable<TResult> filtered = _dbSet.Where(selectBuilder, predicate);
+            int count = filtered.Count();
 
-            var filtered = oSet.Where(selectBuilder, predicate);
-            var count = filtered.Count();
+            Tuple<IEnumerable<TResult>, int>  result = new Tuple<IEnumerable<TResult>, int>(filtered, count);
 
-            return new Tuple<IEnumerable<TResult>, int>(filtered, count);
+            return result;
         }
 
         #endregion

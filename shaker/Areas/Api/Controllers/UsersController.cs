@@ -46,5 +46,13 @@ namespace shaker.Areas.Api.Controllers
         {
             return _usersDomain.Delete(id);
         }
+
+        #region IDisposable Support
+        protected override void Dispose(bool disposing)
+        {
+            _usersDomain.Dispose();
+            base.Dispose(disposing);
+        }
+        #endregion
     }
 }

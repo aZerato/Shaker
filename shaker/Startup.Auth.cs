@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +40,15 @@ namespace shaker
                     options.User.RequireUniqueEmail = true;
                 })
                 .AddDefaultTokenProviders();
+
+            // cookie auth
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.Name = "shaker";
+                options.LoginPath = new PathString("/admin/auth");
+                options.AccessDeniedPath = new PathString("/Home/AccessDenied");
+                options.SlidingExpiration = true;
+            });
 
             // Jwt Secret Key
             var appSettingsSection = Configuration.GetSection("AppSettings");
@@ -77,22 +87,12 @@ namespace shaker
                             return Task.CompletedTask;
                         }
                     };
-                })
-                // Cookie settings
-                .AddCookie(options =>
-                {
-                    
-                    options.Cookie.Name = "shaker";
-                    options.LoginPath = "/admin/auth";
-                    options.AccessDeniedPath = "/Home/AccessDenied";
-                    options.SlidingExpiration = true;
                 });
 
         }
 
         public void CreateDefaultUser(UserManager<User> userManager)
         {
-            // create default user
             if (userManager.FindByNameAsync("aze").Result == null)
             {
                 _ = userManager.CreateAsync(new User

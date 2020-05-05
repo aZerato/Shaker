@@ -4,7 +4,8 @@
 <form class="form-signin"
       method="post"
       asp-controller="AuthAdmin"
-      asp-area="Admin">
+      asp-area="Admin"
+      asp-route-returnUrl="@ViewData["returnUrl"]">
 
     @if(TempData[AuthAdminController.TempDataErrorMessageKey] != null)
     {
@@ -33,7 +34,6 @@
 </form>
 
 <style>
-
     .form-signin {
         width: 100%;
         max-width: 330px;
@@ -68,7 +68,6 @@
             border-top-left-radius: 0;
             border-top-right-radius: 0;
         }
-
 </style>
 
 @section Scripts {

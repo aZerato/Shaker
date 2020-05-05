@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using shaker.data.core;
+using shaker.data;
 using shaker.data.entity.Channels;
 using shaker.domain.Channels;
 using shaker.domain.dto.Channels;
@@ -10,14 +10,14 @@ namespace shaker.domain.Posts
 {
     public class ChannelsDomain : IChannelsDomain
     {
-        private IRepository<Channel> _channelRepository;
-        private IMessagesDomain _messagesDomain;
+        private readonly IUnitOfWork _uow;
+        private readonly IMessagesDomain _messagesDomain;
 
         public ChannelsDomain(
-            IRepository<Channel> channelRepository,
+            IUnitOfWork uow,
             IMessagesDomain messagesDomain)
         {
-            _channelRepository = channelRepository;
+            _uow = uow;
             _messagesDomain = messagesDomain;
         }
 
@@ -30,42 +30,56 @@ namespace shaker.domain.Posts
                 Creation = DateTime.UtcNow.Date
             };
 
-            dto.Id = _channelRepository.Add(entity);
+            string id = _uow.Channels.Add(entity);
+            if (!string.IsNullOrEmpty(id))
+                _uow.Commit();
+            else
+                _uow.RollbackChanges();
 
-            return dto;
+            return ToChannelDto(entity, false);
         }
 
         public bool Delete(string id)
         {
-            Channel ch = _channelRepository.Get(id);
+            Channel ch = _uow.Channels.Get(id);
 
             if (ch == null) return false;
 
-            return _channelRepository.Remove(ch) && _messagesDomain.DeleteAll(id);
+            bool state = _uow.Channels.Remove(ch) && _messagesDomain.DeleteAll(id);
+            if (state)
+                _uow.Commit();
+            else
+                _uow.RollbackChanges();
+
+            return state;
         }
 
         public ChannelDto Get(string id, bool withMessages)
         {
-            Channel entity = _channelRepository.Get(id);
+            Channel entity = _uow.Channels.Get(id);
             return ToChannelDto(entity, true);
         }
 
         public ChannelDto Update(string id, ChannelDto dto)
         {
-            Channel entity = _channelRepository.Get(id);
+            Channel entity = _uow.Channels.Get(id);
 
             entity.Name = dto.Name;
             entity.Description = dto.Description;
             entity.ImgPath = dto.ImgPath;
 
-            _channelRepository.Update(entity);
+            bool state = _uow.Channels.Update(entity);
+            if (state)
+                _uow.Commit();
+            else
+                _uow.RollbackChanges();
 
             return ToChannelDto(entity, true);
         }
 
         public IEnumerable<ChannelDto> GetAll()
         {
-            return _channelRepository.GetAll(ToChannelDtoSb());
+            return _uow.Channels.GetAll(ToChannelDtoSb());
         }
 
         private ChannelDto ToChannelDto(Channel entity, bool withMessages)
@@ -92,5 +106,28 @@ namespace shaker.domain.Posts
                 Creation = s.Creation
             };
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _uow.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
