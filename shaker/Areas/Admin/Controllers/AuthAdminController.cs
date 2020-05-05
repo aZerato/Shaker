@@ -13,7 +13,7 @@ namespace shaker.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("~/admin/auth")]
-    public class AuthAdminController : Controller
+    public class AuthAdminController : Controller, IDisposable
     {
         private readonly IUsersDomain _usersDomain;
         private readonly ILogger<AuthAdminController> _logger;
@@ -100,5 +100,13 @@ namespace shaker.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
         }
+
+        #region IDisposable Support
+        protected override void Dispose(bool disposing)
+        {
+            _usersDomain.Dispose();
+            base.Dispose(disposing);
+        }
+        #endregion
     }
 }

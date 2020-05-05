@@ -29,7 +29,7 @@ Backend (check [Shaker-angular](https://github.com/aZerato/shaker-angular) for t
 
 - DTO : Data Transfer Object (sample: shaker.domain.dto).
 
-- "Select Builder" : Thanks to LINQ you are able to create custom expression for return directly an DTO (sample: MyApp.Domain.SampleModule.Aggregates.SampleDataSelectBuilder).
+- "Select Builder" : Thanks to LINQ you are able to create custom expression for return directly an DTO.
 
 ## 03 - Data
 

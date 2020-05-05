@@ -93,7 +93,6 @@ namespace shaker
 
         public void CreateDefaultUser(UserManager<User> userManager)
         {
-            // create default user
             if (userManager.FindByNameAsync("aze").Result == null)
             {
                 _ = userManager.CreateAsync(new User

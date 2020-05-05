@@ -13,7 +13,7 @@ namespace shaker.Areas.Admin.Controllers
     [Authorize]
     [Area("Admin")]
     [Route("~/admin/blog")]
-    public class BlogAdminController : Controller
+    public class BlogAdminController : Controller, IDisposable
     {
         private readonly IPostsDomain _postsDomain;
         private readonly ILogger<BlogAdminController> _logger;
@@ -77,7 +77,7 @@ namespace shaker.Areas.Admin.Controllers
                 _logger.LogError(ex.Message);
             }
 
-            return View();
+            return new RedirectToActionResult("Create", "Blog", null);
         }
 
         [HttpDelete]
@@ -88,7 +88,7 @@ namespace shaker.Areas.Admin.Controllers
             {
                 _postsDomain.Delete(id);
 
-                return new RedirectToActionResult("Index", "Blog", null);
+                return new RedirectToRouteResult("~/admin/blog");
             }
             catch (Exception ex)
             {
@@ -98,5 +98,14 @@ namespace shaker.Areas.Admin.Controllers
 
             return View();
         }
+
+
+        #region IDisposable Support
+        protected override void Dispose(bool disposing)
+        {
+            _postsDomain.Dispose();
+            base.Dispose(disposing);
+        }
+        #endregion
     }
 }

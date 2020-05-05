@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using shaker.data.core;
+using shaker.data;
 using shaker.data.entity;
 using shaker.domain.dto;
 
@@ -9,11 +9,11 @@ namespace shaker.domain.Posts
 {
     public class PostsDomain : IPostsDomain
     {
-        private IRepository<Post> _postsRepository;
+        private IUnitOfWork _uow;
 
-        public PostsDomain(IRepository<Post> postsRepository)
+        public PostsDomain(IUnitOfWork uow)
         {
-            _postsRepository = postsRepository;
+            _uow = uow;
         }
 
         public PostDto Create(PostDto postDto)
@@ -24,20 +24,21 @@ namespace shaker.domain.Posts
                 Creation = DateTime.UtcNow.Date
             };
 
-            postDto.Id = _postsRepository.Add(postEntity);
+            postDto.Id = _uow.Posts.Add(postEntity);
+            _uow.Commit();
 
             return postDto;
         }
 
         public void Delete(string id)
         {
-            Post post = _postsRepository.Get(id);
-            _postsRepository.Remove(post);
+            Post post = _uow.Posts.Get(id);
+            _uow.Posts.Remove(post);
         }
 
         public IEnumerable<PostDto> GetAll()
         {
-            IEnumerable<PostDto> postDtos = _postsRepository.GetAll().Select(s => new PostDto
+            IEnumerable<PostDto> postDtos = _uow.Posts.GetAll().Select(s => new PostDto
             {
                 Id = s.Id,
                 Content = s.Content,
@@ -47,5 +48,28 @@ namespace shaker.domain.Posts
 
             return postDtos;
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _uow.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

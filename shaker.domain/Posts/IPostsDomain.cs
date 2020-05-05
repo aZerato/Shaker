@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using shaker.domain.dto;
 
 namespace shaker.domain.Posts
 {
-    public interface IPostsDomain
+    public interface IPostsDomain : IDisposable
     {
         PostDto Create(PostDto post);
 

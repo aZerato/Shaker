@@ -52,5 +52,14 @@ namespace shaker.Areas.Hubs
             await Clients.All.SendAsync("UserDisconnected", Context.ConnectionId);
             await base.OnDisconnectedAsync(ex);
         }
+
+
+        #region IDisposable Support
+        protected override void Dispose(bool disposing)
+        {
+            _messageDomain.Dispose();
+            base.Dispose(disposing);
+        }
+        #endregion
     }
 }

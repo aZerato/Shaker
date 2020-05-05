@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Identity;
-using shaker.data.core;
+using shaker.data;
 using shaker.data.entity.Users;
 using shaker.crosscutting.Exceptions;
 using shaker.domain.dto.Users;
@@ -16,18 +16,18 @@ namespace shaker.domain.Users
         private readonly ILogger<UsersDomain> _logger;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
-        private readonly IRepository<User> _usersRepository;
+        private readonly IUnitOfWork _uow;
 
         public UsersDomain(
             ILogger<UsersDomain> logger,
             SignInManager<User> signInManager,
             UserManager<User> userManager,
-            IRepository<User> usersRepository)
+            IUnitOfWork uow)
         {
             _logger = logger;
             _signInManager = signInManager;
             _userManager = userManager;
-            _usersRepository = usersRepository;
+            _uow = uow;
         }
 
         public UserDto Authenticate(AuthDto dto)
@@ -68,7 +68,7 @@ namespace shaker.domain.Users
                 throw new ShakerDomainException(errorPresentation);
             }
 
-            User user = _userManager.FindByNameAsync(dto.UserName.ToUpperInvariant()).Result;
+            User user = _userManager.FindByNameAsync(dto.UserName).Result;
 
             return ToUserDto(user);
         }
@@ -134,7 +134,7 @@ namespace shaker.domain.Users
 
         public IEnumerable<UserDto> GetAll()
         {
-            return _usersRepository.GetAll(ToUserDtoSb()); 
+            return _uow.Users.GetAll(ToUserDtoSb()); 
         }
 
         private static Expression<Func<User, UserDto>> ToUserDtoSb()
@@ -159,5 +159,28 @@ namespace shaker.domain.Users
                     ImgPath = u.ImgPath
                 };
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _uow.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

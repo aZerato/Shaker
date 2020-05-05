@@ -1,0 +1,25 @@
+﻿using System;
+using shaker.data.core;
+using shaker.data.entity;
+using shaker.data.entity.Channels;
+using shaker.data.entity.Users;
+
+namespace shaker.data
+{
+    public interface IUnitOfWork : IDisposable
+    {
+        void Commit();
+
+        virtual void CommitAndRefreshChanges() { }
+
+        void RollbackChanges();
+
+        IRepository<User> Users { get; }
+        IRepository<Role> Roles { get; }
+
+        IRepository<Post> Posts { get; }
+
+        IRepository<Message> Messages { get; }
+        IRepository<Channel> Channels { get; }
+    }
+}

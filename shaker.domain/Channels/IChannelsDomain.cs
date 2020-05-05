@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using shaker.domain.dto.Channels;
 
 namespace shaker.domain.Channels
 {
-    public interface IChannelsDomain
+    public interface IChannelsDomain : IDisposable
     {
         ChannelDto Create(ChannelDto channel);
 

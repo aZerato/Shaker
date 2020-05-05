@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace shaker.Areas.Api.Controllers
 {
-    public class AuthController : Controller
+    public class AuthController : Controller, IDisposable
     {
         private readonly IUsersDomain _usersDomain;
         private readonly IJwtAuth _jwtAuth;
@@ -91,5 +91,13 @@ namespace shaker.Areas.Api.Controllers
                 return BadRequest(new { message = MessagesGetter.Get(ErrorPresentationMessages.DefaultErrorMessage) });
             }
         }
+
+        #region IDisposable Support
+        protected override void Dispose(bool disposing)
+        {
+            _usersDomain.Dispose();
+            base.Dispose(disposing);
+        }
+        #endregion
     }
 }

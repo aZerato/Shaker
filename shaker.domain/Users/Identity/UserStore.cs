@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using shaker.data.core;
+using shaker.data;
 using shaker.data.entity.Users;
 
 namespace shaker.domain.Users.Identity
@@ -22,17 +22,20 @@ namespace shaker.domain.Users.Identity
         IUserTwoFactorStore<User>,
         IUserLockoutStore<User>
     {
-        private readonly IRepository<User> _usersRepository;
+        private readonly IUnitOfWork _uow;
 
-        public UserStore(IRepository<User> usersRepository)
+        public UserStore(IUnitOfWork uow)
         {
-            _usersRepository = usersRepository;
+            _uow = uow;
         }
 
-        public void Dispose()
+        #region IDisposable Support
+        public virtual void Dispose()
         {
+            _uow.Dispose();
             GC.SuppressFinalize(this);
         }
+        #endregion
 
         public Task AddClaimsAsync(User user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
         {
@@ -56,44 +59,54 @@ namespace shaker.domain.Users.Identity
 
         public Task<IdentityResult> CreateAsync(User user, CancellationToken cancellationToken)
         {
-            user.Id = _usersRepository.Add(user);
+            _uow.Users.Add(user);
 
             IdentityResult result = IdentityResult.Failed();
 
-            if (!string.IsNullOrEmpty(user.Id)) result = IdentityResult.Success;
+            if (!string.IsNullOrEmpty(user.Id))
+            {
+                result = IdentityResult.Success;
+                _uow.Commit();
+            }
 
             return Task.FromResult(result);
         }
 
         public Task<IdentityResult> DeleteAsync(User user, CancellationToken cancellationToken)
         {
-            bool state = _usersRepository.Remove(user);
+            bool state = _uow.Users.Remove(user);
 
             IdentityResult result = IdentityResult.Failed();
 
-            if (state) result = IdentityResult.Success;
+            if (state)
+            {
+                result = IdentityResult.Success;
+                _uow.Commit();
+            }
 
             return Task.FromResult(result);
         }
 
-        public Task<User> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        public Task<User> FindByEmailAsync(string email, CancellationToken cancellationToken)
         {
-            return Task.FromResult(_usersRepository.Get(u => u.Email == normalizedEmail));
+            string normalizedEmail = email.ToUpperInvariant();
+            return Task.FromResult(_uow.Users.Get(u => u.NormalizedEmail == normalizedEmail));
         }
 
         public Task<User> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            return Task.FromResult(_usersRepository.Get(userId));
+            return Task.FromResult(_uow.Users.Get(userId));
         }
 
         public Task<User> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
-            return Task.FromResult(_usersRepository.Get(u => u.Logins.Any(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey)));
+            return Task.FromResult(_uow.Users.Get(u => u.Logins.Any(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey)));
         }
 
-        public Task<User> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public Task<User> FindByNameAsync(string userName, CancellationToken cancellationToken)
         {
-            return Task.FromResult(_usersRepository.Get(u => u.NormalizedUserName == normalizedUserName));
+            string normalizedUserName = userName.ToUpperInvariant();
+            return Task.FromResult(_uow.Users.Get(u => u.NormalizedUserName == normalizedUserName));
         }
 
         public Task<IList<Claim>> GetClaimsAsync(User user, CancellationToken cancellationToken)
@@ -163,12 +176,12 @@ namespace shaker.domain.Users.Identity
 
         public Task<IList<User>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken)
         {
-            return Task.FromResult((IList<User>)_usersRepository.GetAll(u => u.Claims.Any(c => c.Type == claim.Type && c.Value == claim.Value)));
+            return Task.FromResult((IList<User>)_uow.Users.GetAll(u => u.Claims.Any(c => c.Type == claim.Type && c.Value == claim.Value)));
         }
 
         public Task<IList<User>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
         {
-            return Task.FromResult((IList<User>)_usersRepository.GetAll(u => u.Roles.Any(r => r == roleName)));
+            return Task.FromResult((IList<User>)_uow.Users.GetAll(u => u.Roles.Any(r => r == roleName)));
         }
 
         public Task<bool> HasPasswordAsync(User user, CancellationToken cancellationToken)
@@ -265,9 +278,11 @@ namespace shaker.domain.Users.Identity
 
         public Task<IdentityResult> UpdateAsync(User user, CancellationToken cancellationToken)
         {
-            bool state = _usersRepository.Update(user);
+            bool state = _uow.Users.Update(user);
 
             IdentityResult result = state ? IdentityResult.Success : IdentityResult.Failed();
+
+            if (state) _uow.Commit();
 
             return Task.FromResult(result);
         }

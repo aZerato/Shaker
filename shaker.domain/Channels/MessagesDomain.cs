@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using shaker.crosscutting.Accessors;
-using shaker.data.core;
+using shaker.data;
 using shaker.data.entity.Channels;
 using shaker.data.entity.Users;
 using shaker.domain.dto.Channels;
@@ -12,29 +12,28 @@ namespace shaker.domain.Channels
 {
     public class MessagesDomain : IMessagesDomain
     {
+        private IUnitOfWork _uow;
         private IConnectedUserAccessor _connectedUserAccessor;
-        private IRepository<Message> _repository;
 
         public MessagesDomain(
-            IConnectedUserAccessor connectedUserAccessor,
-            IRepository<Message> repository)
+            IUnitOfWork uow,
+            IConnectedUserAccessor connectedUserAccessor)
         {
+            _uow = uow;
             _connectedUserAccessor = connectedUserAccessor;
-            _repository = repository;
         }
 
         public MessageDto Create(MessageDto dto)
         {
-            Channel ch = new Channel();
-            ch.Id = dto.ChannelId;
             Message entity = new Message() {
-                Channel = ch,
+                Channel = new Channel() { Id = dto.ChannelId },
                 User = new User() { Id = _connectedUserAccessor.GetId() },
                 Content = dto.Content,
                 Creation = DateTime.UtcNow.Date
             };
 
-            entity.Id = _repository.Add(entity);
+            _uow.Messages.Add(entity);
+            _uow.Commit();
 
             dto = ToMessageDto(entity);
 
@@ -43,21 +42,21 @@ namespace shaker.domain.Channels
 
         public bool DeleteOne(string id)
         {
-            Message msg = _repository.Get(id);
+            Message msg = _uow.Messages.Get(id);
 
             if (msg == null) return false;
 
-            return _repository.Remove(msg);
+            return _uow.Messages.Remove(msg);
         }
 
         public bool DeleteAll(string channelId)
         {
-            IEnumerable<Message> msgs = _repository.GetAll(m => m.Channel.Id == channelId);
+            IEnumerable<Message> msgs = _uow.Messages.GetAll(m => m.Channel.Id == channelId);
 
             bool state = msgs == null || !msgs.Any() ? true : false;
             foreach(Message msg in msgs)
             {
-                state = _repository.Remove(msg);
+                state = _uow.Messages.Remove(msg);
             }
 
             return state;
@@ -65,7 +64,7 @@ namespace shaker.domain.Channels
 
         public IEnumerable<MessageDto> GetAll(string channelId)
         {
-            return  _repository.GetAll(ToMessageDtoSb(), m => m.Channel.Id == channelId);
+            return _uow.Messages.GetAll(ToMessageDtoSb(), m => m.Channel.Id == channelId);
         }
 
         private static Expression<Func<Message, MessageDto>> ToMessageDtoSb()
@@ -91,5 +90,28 @@ namespace shaker.domain.Channels
                 Creation = msg.Creation
             };
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _uow.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

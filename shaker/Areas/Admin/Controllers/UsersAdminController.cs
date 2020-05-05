@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using shaker.domain.Users;
@@ -8,7 +9,7 @@ namespace shaker.Areas.Admin.Controllers
     [Authorize]
     [Area("Admin")]
     [Route("~/admin/users/{action}")]
-    public class UsersAdminController : Controller
+    public class UsersAdminController : Controller, IDisposable
     {
         private readonly IUsersDomain _usersDomain;
         private readonly ILogger<UsersAdminController> _logger;
@@ -44,5 +45,13 @@ namespace shaker.Areas.Admin.Controllers
 
             return RedirectToAction("Index");
         }
+
+        #region IDisposable Support
+        protected override void Dispose(bool disposing)
+        {
+            _usersDomain.Dispose();
+            base.Dispose(disposing);
+        }
+        #endregion
     }
 }
