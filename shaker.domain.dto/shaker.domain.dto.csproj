@@ -7,6 +7,9 @@
   <ItemGroup>
     <Folder Include="Channels\" />
     <Folder Include="Users\" />
+    <Folder Include="Movements\" />
+    <Folder Include="Posts\" />
+    <Folder Include="Planning\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\shaker.data.core\shaker.data.core.csproj" />

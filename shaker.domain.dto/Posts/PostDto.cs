@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace shaker.domain.dto
+namespace shaker.domain.dto.Posts
 {
     public class PostDto : IBaseDto
     {

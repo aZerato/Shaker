@@ -1,8 +1,9 @@
 ﻿using System;
 using shaker.data.core;
-using shaker.data.entity;
+using shaker.data.entity.Posts;
 using shaker.data.entity.Channels;
 using shaker.data.entity.Users;
+using shaker.data.entity.Movements;
 
 namespace shaker.data
 {
@@ -21,5 +22,12 @@ namespace shaker.data
 
         IRepository<Message> Messages { get; }
         IRepository<Channel> Channels { get; }
+
+        IRepository<BodyPart> BodyParts { get; }
+        IRepository<BodyZone> BodyZones { get; }
+        IRepository<Movement> Movements { get; }
+        IRepository<MovementBodyZone> MovementBodyZone { get; }
+        IRepository<MovementBodyPart> MovementBodyPart { get; }
+        IRepository<MovementType> MovementTypes { get; }
     }
 }

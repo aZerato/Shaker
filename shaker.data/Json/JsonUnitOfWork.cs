@@ -1,6 +1,6 @@
 ﻿using System;
 using shaker.data.core;
-using shaker.data.entity;
+using shaker.data.entity.Posts;
 using shaker.data.entity.Channels;
 using shaker.data.entity.Users;
 

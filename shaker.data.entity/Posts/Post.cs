@@ -2,7 +2,7 @@
 using LiteDB;
 using shaker.data.core;
 
-namespace shaker.data.entity
+namespace shaker.data.entity.Posts
 {
     public class Post : IBaseEntity
     {
@@ -12,7 +12,7 @@ namespace shaker.data.entity
         }
 
         [BsonId]
-        public string Id { get; }
+        public string Id { get; set; }
 
         public string Description { get; set; }
 
