@@ -8,13 +8,13 @@ Backend (check [Shaker-angular](https://github.com/aZerato/shaker-angular) for t
 
 > The user interface layer
 
-- Basic MVC app for this Backend with Admin console
+- MVC app for this Backend with Admin console
 
-- SignalR : WebSocket (MessagePack)
+- [SignalR](https://dotnet.microsoft.com/apps/aspnet/signalr) : WebSocket ([MessagePack](https://msgpack.org/))
 
 - Rest API
 
-- Identity implementation (with liteDB)
+- [Identity](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-3.1&tabs=visual-studio) implementation (with liteDB)
     - UserManager of Identity
     - Jwt Token Bearer (works with SignalR & Api parts)
     - Cookies auth for Admin
@@ -27,9 +27,9 @@ Backend (check [Shaker-angular](https://github.com/aZerato/shaker-angular) for t
 
 > The data management layer
 
-- DTO : Data Transfer Object (sample: shaker.domain.dto).
+- The global app logic
 
-- "Select Builder" : Thanks to LINQ you are able to create custom expression for return directly an DTO.
+- DTO : Data Transfer Object (sample: shaker.domain.dto).
 
 ## 03 - Data
 
@@ -39,7 +39,7 @@ Backend (check [Shaker-angular](https://github.com/aZerato/shaker-angular) for t
 
 - The [Unit Of Work (UnitOfWork / UoW) Pattern](https://martinfowler.com/eaaCatalog/unitOfWork.html) add transactions for the resolution of concurrency problems (shaker.data.core.IUnitOfWork).
 
-- The [Repository Pattern](https://msdn.microsoft.com/en-us/library/ff649690.aspx) add a layer between DbSet (return IQueryable) with UoW and the data used in "Domain" layer. 
+- The [Repository Pattern](https://msdn.microsoft.com/en-us/library/ff649690.aspx) add a layer between DbSet (return IQueryable) and the data used in "Domain" layer. 
 Queryable manipulation is sensible, a Repository return an Enumerable or an Entity. (shaker.data.core.Repository)
 
 
