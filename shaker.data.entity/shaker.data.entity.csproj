@@ -10,6 +10,10 @@
   <ItemGroup>
     <Folder Include="Channels\" />
     <Folder Include="Users\" />
+    <Folder Include="Planning\" />
+    <Folder Include="Trainings\" />
+    <Folder Include="Movements\" />
+    <Folder Include="Posts\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AspNetCore.Identity.LiteDB" Version="2.7.0" />

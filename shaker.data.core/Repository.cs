@@ -77,45 +77,52 @@ namespace shaker.data.core
         }
 
         /// <summary>
-        /// <see cref="IRepository{TEntity}.Get(int)"/>
+        /// <see cref="IRepository{TEntity}.Get(int, Expression[])"/>
         /// </summary>
-        /// <param name="id"><see cref="IRepository{TEntity}.Get(int)"/></param>
+        /// <param name="id"><see cref="IRepository{TEntity}.Get(int, Expression[])"/></param>
+        /// <param name="includes"><see cref="IRepository{TEntity}.Get(int, Expression[])"/></param>
         /// <returns></returns>
-        public virtual TEntity Get(string id)
+        public virtual TEntity Get(string id,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes)
         {
-            return _dbSet.Find(id);
+            return _dbSet.Find(id, includes);
         }
 
         /// <summary>
-        /// <see cref="IRepository{TEntity}.Get(Expression)"/>
+        /// <see cref="IRepository{TEntity}.Get(Expression, Expression[])"/>
         /// </summary>
-        /// <typeparam name="TResult"><see cref="IRepository{TEntity}.Get(Expression)"/></typeparam>
-        /// <param name="predicate"><see cref="IRepository{TEntity}.Get(Expression)"/></param>
-        /// <returns><see cref="IRepository{TEntity}.Get(Expression)"/></returns>
-        public virtual TEntity Get(Expression<Func<TEntity, bool>> predicate)
+        /// <typeparam name="TResult"><see cref="IRepository{TEntity}.Get(Expression, Expression[])"/></typeparam>
+        /// <param name="predicate"><see cref="IRepository{TEntity}.Get(Expression, Expression[])"/></param>
+        /// <param name="includes"><see cref="IRepository{TEntity}.Get(int, Expression[])"/></param>
+        /// <returns><see cref="IRepository{TEntity}.Get(Expression, Expression[])"/></returns>
+        public virtual TEntity Get(Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes)
         {
-            return _dbSet.Where(predicate).SingleOrDefault();
+            return _dbSet.Where(predicate, includes).SingleOrDefault();
         }
 
         /// <summary>
-        /// <see cref="IRepository{TEntity}.GetAll()"/>
+        /// <see cref="IRepository{TEntity}.GetAll(Expression[])"/>
         /// </summary>
-        /// <returns><see cref="IRepository{TEntity}.GetAll()"/></returns>
-        public virtual IEnumerable<TEntity> GetAll()
+        /// <param name="includes"><see cref="IRepository{TEntity}.Get(int, Expression[])"/></param>
+        /// <returns><see cref="IRepository{TEntity}.GetAll(Expression[])"/></returns>
+        public virtual IEnumerable<TEntity> GetAll(params Expression<Func<TEntity, IBaseEntity>>[] includes)
         {
-            return _dbSet.AsEnumerable();
+            return _dbSet.AsEnumerable(includes);
         }
 
         /// <summary>
-        /// <see cref="IRepository{TEntity}.GetAll(Expression, Expression)"/>
+        /// <see cref="IRepository{TEntity}.GetAll(Expression, Expression, params Expression[])"/>
         /// </summary>
-        /// <typeparam name="TResult"><see cref="IRepository{TEntity}.GetAll(Expression, Expression)"/></typeparam>
-        /// <param name="selectBuilder"><see cref="IRepository{TEntity}.GetAll(Expression, Expression)"/></param>
-        /// <returns><see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression)"/></returns>
-        public virtual IEnumerable<TResult> GetAll<TResult>(Expression<Func<TEntity, TResult>> selectBuilder)
+        /// <typeparam name="TResult"><see cref="IRepository{TEntity}.GetAll(Expression, Expression, params Expression[])"/></typeparam>
+        /// <param name="selectBuilder"><see cref="IRepository{TEntity}.GetAll(Expression, Expression, params Expression[])"/></param>
+        /// <param name="includes"><see cref="IRepository{TEntity}.Get(int, Expression[])"/></param>
+        /// <returns><see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression, params Expression[])"/></returns>
+        public virtual IEnumerable<TResult> GetAll<TResult>(Expression<Func<TEntity, TResult>> selectBuilder,
+                params Expression<Func<TEntity, IBaseEntity>>[] includes)
                 where TResult : IBaseEntity
         {
-            return _dbSet.Select(selectBuilder);
+            return _dbSet.Select(selectBuilder, includes);
         }
 
         /// <summary>
@@ -123,10 +130,12 @@ namespace shaker.data.core
         /// </summary>
         /// <typeparam name="TResult"><see cref="IRepository{TEntity}.GetAll(Expression)"/></typeparam>
         /// <param name="predicate"><see cref="IRepository{TEntity}.GetAll(Expression)"/></param>
+        /// <param name="includes"><see cref="IRepository{TEntity}.Get(int, Expression[])"/></param>
         /// <returns><see cref="IRepository{TEntity}.GetAllAndCount(Expression)"/></returns>
-        public virtual IEnumerable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate)
+        public virtual IEnumerable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes)
         {
-            return _dbSet.Where(predicate);
+            return _dbSet.Where(predicate, includes);
         }
 
         /// <summary>
@@ -135,30 +144,34 @@ namespace shaker.data.core
         /// <typeparam name="TResult"><see cref="IRepository{TEntity}.GetAll(Expression, Expression)"/></typeparam>
         /// <param name="selectBuilder"><see cref="IRepository{TEntity}.GetAll(Expression, Expression)"/></param>
         /// <param name="predicate"><see cref="IRepository{TEntity}.GetAll(Expression, Expression)"/></param>
+        /// <param name="includes"><see cref="IRepository{TEntity}.Get(int, Expression[])"/></param>
         /// <returns><see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression)"/></returns>
         public virtual IEnumerable<TResult> GetAll<TResult>(Expression<Func<TEntity, TResult>> selectBuilder,
-            Expression<Func<TEntity, bool>> predicate)
+            Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes)
                 where TResult : IBaseEntity
         {
-            return _dbSet.Where(selectBuilder, predicate);
+            return _dbSet.Where(selectBuilder, predicate, includes);
         }
 
         /// <summary>
-        /// <see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression)"/>
+        /// <see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression, params Expression[])"/>
         /// </summary>
-        /// <typeparam name="TResult"><see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression)"/></typeparam>
-        /// <param name="selectBuilder"><see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression)"/></param>
-        /// <param name="predicate"><see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression)"/></param>
-        /// <returns><see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression)"/></returns>
+        /// <typeparam name="TResult"><see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression, []Expression)"/></typeparam>
+        /// <param name="selectBuilder"><see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression, Expression[])"/></param>
+        /// <param name="predicate"><see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression, Expression[])"/></param>
+        /// <param name="includes"><see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression, Expression[])"/></param>
+        /// <returns><see cref="IRepository{TEntity}.GetAllAndCount(Expression, Expression, Expression[])"/></returns>
         public virtual Tuple<IEnumerable<TResult>, int> GetAllAndCount<TResult>(
             Expression<Func<TEntity, TResult>> selectBuilder,
-            Expression<Func<TEntity, bool>> predicate)
+            Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes)
                 where TResult : IBaseEntity
         {
-            IEnumerable<TResult> filtered = _dbSet.Where(selectBuilder, predicate);
+            IEnumerable<TResult> filtered = _dbSet.Where(selectBuilder, predicate, includes);
             int count = filtered.Count();
 
-            Tuple<IEnumerable<TResult>, int>  result = new Tuple<IEnumerable<TResult>, int>(filtered, count);
+            Tuple<IEnumerable<TResult>, int> result = new Tuple<IEnumerable<TResult>, int>(filtered, count);
 
             return result;
         }

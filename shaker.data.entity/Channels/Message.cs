@@ -13,10 +13,12 @@ namespace shaker.data.entity.Channels
         }
 
         [BsonId]
-        public string Id { get; }
+        public string Id { get; set; }
 
+        [BsonRef("User")]
         public User User { get; set; }
 
+        [BsonRef("Channel")]
         public Channel Channel { get; set; }
 
         public string Content { get; set; }

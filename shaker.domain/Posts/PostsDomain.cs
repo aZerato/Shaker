@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using shaker.data;
-using shaker.data.entity;
-using shaker.domain.dto;
+using shaker.data.entity.Posts;
+using shaker.domain.dto.Posts;
 
 namespace shaker.domain.Posts
 {

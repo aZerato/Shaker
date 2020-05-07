@@ -16,5 +16,7 @@
     <Folder Include="Channels\" />
     <Folder Include="Users\" />
     <Folder Include="Users\Identity\" />
+    <Folder Include="Movements\" />
+    <Folder Include="Planning\" />
   </ItemGroup>
 </Project>

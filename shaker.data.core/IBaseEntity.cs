@@ -11,6 +11,6 @@ namespace shaker.data.core
         /// Gets or sets the Identifier.
         /// </summary>
         [BsonId]
-        string Id { get; }
+        string Id { get; set; }
     }
 }

@@ -91,18 +91,6 @@ namespace shaker
 
         }
 
-        public void CreateDefaultUser(UserManager<User> userManager)
-        {
-            if (userManager.FindByNameAsync("aze").Result == null)
-            {
-                _ = userManager.CreateAsync(new User
-                {
-                    UserName = "aze",
-                    Email = "aze@shaker.com"
-                }, "&aZ(erato123").Result;
-            }
-        }   
-
         public void ConfigureAuth(IApplicationBuilder app)
         {
             app.UseCookiePolicy();

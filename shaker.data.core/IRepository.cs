@@ -38,38 +38,46 @@ namespace shaker.data.core
         /// Get an entity by id from context.
         /// </summary>
         /// <param name="id">The entity id.</param>
+        /// <param name="includes">Linked object.</param>
         /// <returns>Expected entity.</returns>
-        TEntity Get(string id);
+        TEntity Get(string id, params Expression<Func<TEntity, IBaseEntity>>[] includes);
 
         /// <summary>
         /// Get entity from context.
         /// </summary>
         /// <typeparam name="TResult">Expected return object.</typeparam>
         /// <param name="predicate">Custom filter expression.</param>
+        /// <param name="includes">Linked object.</param>
         /// <returns>Expected entity.</returns>
-        TEntity Get(Expression<Func<TEntity, bool>> predicate);
+        TEntity Get(Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes);
 
         /// <summary>
         /// Get entities from context.
         /// </summary>
+        /// <param name="includes">Linked object.</param>
         /// <returns>Expected entities.</returns>
-        IEnumerable<TEntity> GetAll();
+        IEnumerable<TEntity> GetAll(params Expression<Func<TEntity, IBaseEntity>>[] includes);
 
         /// <summary>
         /// Get entities from context.
         /// </summary>
         /// <typeparam name="TResult">Expected return objects.</typeparam>
         /// <param name="predicate">Custom filter expression.</param>
+        /// <param name="includes">Linked object.</param>
         /// <returns>Expected entities.</returns>
-        IEnumerable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate);
+        IEnumerable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes);
 
         /// <summary>
         /// Get entities from context.
         /// </summary>
         /// <typeparam name="TResult">Expected return objects.</typeparam>
         /// <param name="selectBuilder">Custom select expression.</param>
+        /// <param name="includes">Linked object.</param>
         /// <returns>Expected entities.</returns>
-        IEnumerable<TResult> GetAll<TResult>(Expression<Func<TEntity, TResult>> selectBuilder)
+        IEnumerable<TResult> GetAll<TResult>(Expression<Func<TEntity, TResult>> selectBuilder,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes)
             where TResult : IBaseEntity;
 
         /// <summary>
@@ -78,9 +86,11 @@ namespace shaker.data.core
         /// <typeparam name="TResult">Expected return objects.</typeparam>
         /// <param name="selectBuilder">Custom select expression.</param>
         /// <param name="predicate">Custom filter expression.</param>
+        /// <param name="includes">Linked object.</param>
         /// <returns>Expected entities.</returns>
         IEnumerable<TResult> GetAll<TResult>(Expression<Func<TEntity, TResult>> selectBuilder,
-            Expression<Func<TEntity, bool>> predicate)
+            Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes)
                 where TResult : IBaseEntity;
 
         /// <summary>
@@ -89,10 +99,12 @@ namespace shaker.data.core
         /// <typeparam name="TResult">Expected return objects.</typeparam>
         /// <param name="selectBuilder">Custom select expression.</param>
         /// <param name="predicate">Custom filter expression.</param>
+        /// <param name="includes">Linked object.</param>
         /// <returns>Expected entities and count.</returns>
         Tuple<IEnumerable<TResult>, int> GetAllAndCount<TResult>(
             Expression<Func<TEntity, TResult>> selectBuilder,
-            Expression<Func<TEntity, bool>> predicate)
+            Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes)
                 where TResult : IBaseEntity;
     }
 }
