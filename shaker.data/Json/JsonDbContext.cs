@@ -5,6 +5,7 @@ using shaker.data.entity.Posts;
 using shaker.data.entity.Channels;
 using shaker.data.entity.Users;
 using shaker.data.entity.Movements;
+using shaker.data.entity.Planning;
 
 namespace shaker.data.Json
 {
@@ -26,9 +27,12 @@ namespace shaker.data.Json
             BodyParts = new JsonDbSet<BodyPart>(_liteDatabase);
             BodyZones = new JsonDbSet<BodyZone>(_liteDatabase);
             Movements = new JsonDbSet<Movement>(_liteDatabase);
-            MovementBodyZone = new JsonDbSet<MovementBodyZone>(_liteDatabase);
-            MovementBodyPart = new JsonDbSet<MovementBodyPart>(_liteDatabase);
+            MovementBodyZones = new JsonDbSet<MovementBodyZone>(_liteDatabase);
+            MovementBodyParts = new JsonDbSet<MovementBodyPart>(_liteDatabase);
             MovementTypes = new JsonDbSet<MovementType>(_liteDatabase);
+
+            CalendarEvents = new JsonDbSet<CalendarEvent>(_liteDatabase);
+            CalendarEventTypes = new JsonDbSet<CalendarEventType>(_liteDatabase);
         }
 
         public IDbSet<User> Users { get; }
@@ -41,9 +45,12 @@ namespace shaker.data.Json
         public IDbSet<BodyPart> BodyParts { get; }
         public IDbSet<BodyZone> BodyZones { get; }
         public IDbSet<Movement> Movements { get; }
-        public IDbSet<MovementBodyZone> MovementBodyZone { get; }
-        public IDbSet<MovementBodyPart> MovementBodyPart { get; }
+        public IDbSet<MovementBodyZone> MovementBodyZones { get; }
+        public IDbSet<MovementBodyPart> MovementBodyParts { get; }
         public IDbSet<MovementType> MovementTypes { get; }
+
+        public IDbSet<CalendarEvent> CalendarEvents { get; }
+        public IDbSet<CalendarEventType> CalendarEventTypes { get; }
 
         public void Commit()
         {

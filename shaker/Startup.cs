@@ -59,7 +59,7 @@ namespace shaker
         {
             if (env.IsDevelopment())
             {
-                CreateDefaultUser(userManager);
+                CreateDefaultData(services, userManager);
                 app.UseDeveloperExceptionPage();
             }
             else

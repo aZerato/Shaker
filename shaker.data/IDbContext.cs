@@ -10,23 +10,25 @@ namespace shaker.data
 {
     public interface IDbContext : IDisposable
     {
+        void Commit();
+        void RollbackChanges();
+
         IDbSet<User> Users { get; }
         IDbSet<Role> Roles { get; }
 
         IDbSet<Post> Posts { get; }
+
         IDbSet<Message> Messages { get; }
         IDbSet<Channel> Channels { get; }
 
         IDbSet<BodyPart> BodyParts { get; }
         IDbSet<BodyZone> BodyZones { get; }
         IDbSet<Movement> Movements { get; }
-        IDbSet<MovementBodyZone> MovementBodyZone { get; }
+        IDbSet<MovementBodyZone> MovementBodyZones { get; }
+        IDbSet<MovementBodyPart> MovementBodyParts { get; }
         IDbSet<MovementType> MovementTypes { get; }
 
         IDbSet<CalendarEvent> CalendarEvents { get; }
         IDbSet<CalendarEventType> CalendarEventTypes { get; }
-
-        void Commit();
-        void RollbackChanges();
     }
 }

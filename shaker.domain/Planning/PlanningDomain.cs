@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using shaker.crosscutting.Accessors;
+using shaker.crosscutting.Exceptions;
 using shaker.data;
-using shaker.data.entity.Channels;
 using shaker.data.entity.Planning;
 using shaker.data.entity.Users;
-using shaker.domain.dto.Channels;
+using shaker.domain.dto.Planning;
 
 namespace shaker.domain.Planning
 {
@@ -26,69 +26,128 @@ namespace shaker.domain.Planning
 
         public CalendarEventDto Create(CalendarEventDto dto)
         {
-            CalendarEvent entity = new CalendarEvent() {
-
+            CalendarEvent entity = new CalendarEvent()
+            {
+                AllDay = dto.AllDay,
+                Start = dto.Start,
+                End = dto.End,
                 User = new User() { Id = _connectedUserAccessor.GetId() },
-                Content = dto.Content,
-                Creation = DateTime.UtcNow.Date
+                hexColor = dto.hexColor,
+                Title = dto.Title,
+                Type = new CalendarEventType() { Id = dto.Id }
             };
 
-            _uow.Messages.Add(entity);
+            _uow.CalendarEvents.Add(entity);
             _uow.Commit();
 
-            dto = ToMessageDto(entity);
+            dto = ToCalendarEventDto(entity);
 
             return dto;
         }
 
-        public bool DeleteOne(string id)
+        public CalendarEventTypeDto Create(CalendarEventTypeDto dto)
         {
-            Message msg = _uow.Messages.Get(id);
-
-            if (msg == null) return false;
-
-            return _uow.Messages.Remove(msg);
-        }
-
-        public bool DeleteAll(string channelId)
-        {
-            IEnumerable<Message> msgs = _uow.Messages.GetAll(m => m.Channel.Id == channelId);
-
-            bool state = msgs == null || !msgs.Any() ? true : false;
-            foreach(Message msg in msgs)
+            CalendarEventType entity = new CalendarEventType()
             {
-                state = _uow.Messages.Remove(msg);
-            }
+                Title = dto.Title
+            };
 
-            return state;
+            _uow.CalendarEventTypes.Add(entity);
+            _uow.Commit();
+
+            dto = ToCalendarEventTypeDto(entity);
+
+            return dto;
         }
 
-        public IEnumerable<MessageDto> GetAll(string channelId)
+
+        public CalendarEventDto Get(string id)
         {
-            return _uow.Messages.GetAll(ToMessageDtoSb(), m => m.Channel.Id == channelId);
+            CalendarEvent entity = _uow.CalendarEvents.Get(id, x => x.Type);
+
+            if (entity == null)
+                throw new ShakerDomainException("No entry in DB");
+
+            return ToCalendarEventDto(entity);
         }
 
-        private static Expression<Func<Message, MessageDto>> ToMessageDtoSb()
+        public bool Delete(string id)
         {
-            return msg => new MessageDto
+            CalendarEvent entity = _uow.CalendarEvents.Get(id);
+
+            if (entity == null)
+                throw new ShakerDomainException("No entry in DB");
+
+            return _uow.CalendarEvents.Remove(entity);
+        }
+
+        public IEnumerable<CalendarEventDto> GetAll(DateTime from, DateTime? to, string eventTypeId)
+        {
+            IEnumerable<CalendarEventDto> calendarEvents = _uow.CalendarEvents.GetAll(ToCalendarEventDtoSb());
+
+            if (to.HasValue)
+                calendarEvents.Where(c => c.Start >= from);
+
+            if (!string.IsNullOrEmpty(eventTypeId))
+                calendarEvents.Where(c => c.Type.Id == eventTypeId);
+
+            return calendarEvents;
+        }
+
+        public IEnumerable<CalendarEventTypeDto> GetAllType()
+        {
+            return _uow.CalendarEventTypes.GetAll(ToCalendarEventTypeDtoSb());
+        }
+
+        private static Expression<Func<CalendarEvent, CalendarEventDto>> ToCalendarEventDtoSb()
+        {
+            return entity => new CalendarEventDto
             {
-                Id = msg.Id,
-                ChannelId = msg.Channel.Id,
-                UserId = msg.User.Id,
-                Content = msg.Content,
-                Creation = msg.Creation
+                Id = entity.Id,
+                Title = entity.Title,
+                UserId = entity.User.Id,
+                AllDay = entity.AllDay,
+                Start = entity.Start,
+                End = entity.End,
+                hexColor = entity.hexColor,
+                Type = new CalendarEventTypeDto
+                {
+                    Id = entity.Type.Id,
+                    Title = entity.Type.Title
+                }
             };
         }
 
-        private static MessageDto ToMessageDto(Message msg)
+        private static CalendarEventDto ToCalendarEventDto(CalendarEvent entity)
         {
-            return new MessageDto
+            return new CalendarEventDto
             {
-                Id = msg.Id,
-                ChannelId = msg.Channel.Id,
-                UserId = msg.User.Id,
-                Content = msg.Content,
-                Creation = msg.Creation
+                Id = entity.Id,
+                Title = entity.Title,
+                UserId = entity.User.Id,
+                AllDay = entity.AllDay,
+                Start = entity.Start,
+                End = entity.End,
+                hexColor = entity.hexColor,
+                Type = entity.Type != null ? ToCalendarEventTypeDto(entity.Type) : null
+            };
+        }
+
+        private static Expression<Func<CalendarEventType, CalendarEventTypeDto>> ToCalendarEventTypeDtoSb()
+        {
+            return entity => new CalendarEventTypeDto
+            {
+                Id = entity.Id,
+                Title = entity.Title
+            };
+        }
+
+        private static CalendarEventTypeDto ToCalendarEventTypeDto(CalendarEventType entity)
+        {
+            return new CalendarEventTypeDto
+            {
+                Id = entity.Id,
+                Title = entity.Title
             };
         }
 

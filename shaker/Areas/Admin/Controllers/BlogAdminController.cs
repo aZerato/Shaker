@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using shaker.domain.Posts;
-using shaker.domain.dto;
+using shaker.domain.dto.Posts;
 using shaker.Models.Posts;
 using System;
 using Microsoft.AspNetCore.Authorization;

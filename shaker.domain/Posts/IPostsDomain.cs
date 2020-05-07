@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using shaker.domain.dto;
+using shaker.domain.dto.Posts;
 
 namespace shaker.domain.Posts
 {

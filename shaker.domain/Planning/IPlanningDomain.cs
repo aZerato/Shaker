@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using shaker.domain.dto.Channels;
+using shaker.domain.dto.Planning;
 
-namespace shaker.domain.Channels
+namespace shaker.domain.Planning
 {
-    public interface IMessagesDomain : IDisposable
+    public interface IPlanningDomain : IDisposable
     {
-        MessageDto Create(MessageDto message);
+        CalendarEventDto Create(CalendarEventDto dto);
 
-        bool DeleteOne(string id);
+        CalendarEventTypeDto Create(CalendarEventTypeDto dto);
 
-        bool DeleteAll(string channelId);
+        bool Delete(string id);
 
-        IEnumerable<MessageDto> GetAll(string channelId);
+        CalendarEventDto Get(string eventId);
+
+        IEnumerable<CalendarEventDto> GetAll(DateTime from, DateTime? to, string eventTypeId);
+
+        IEnumerable<CalendarEventTypeDto> GetAllType();
     }
 }

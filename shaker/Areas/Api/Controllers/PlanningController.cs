@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using shaker.domain.Users;
-using shaker.domain.dto.Users;
+using shaker.domain.Planning;
+using shaker.domain.dto.Planning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System;
 
 namespace shaker.Areas.Api.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     public class PlanningController : Controller
     {
@@ -25,32 +26,53 @@ namespace shaker.Areas.Api.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<UserDto> Get()
+        public IEnumerable<CalendarEventDto> Get()
         {
-            return _usersDomain.GetAll();
+            //method events of the current month
+            return new List<CalendarEventDto>();
+        }
+
+        [HttpGet]
+        [Route("types")]
+        public IEnumerable<CalendarEventTypeDto> GetTypes()
+        {
+            return _planningDomain.GetAllType();
+        }
+
+        [HttpGet("from/{from}/{to?}/{type?}")]
+        public IEnumerable<CalendarEventDto> Get(DateTime from, DateTime? to, string eventTypeId)
+        {
+            return _planningDomain.GetAll(from, to, eventTypeId);
         }
 
         [HttpGet("{id}")]
-        public UserDto Get(string id)
+        public CalendarEventDto Get(string id)
         {
-            return _usersDomain.Get(id);
+            return _planningDomain.Get(id);
         }
 
+        [HttpPost]
+        public void Post([FromBody]CalendarEventDto dto)
+        {
+            _planningDomain.Create(dto);
+        }
+
+
         [HttpPut("{id}")]
-        public void Put(string id, [FromBody]UserDto value)
+        public void Put(string id, [FromBody]CalendarEventDto value)
         {
         }
 
         [HttpDelete("{id}")]
         public bool Delete(string id)
         {
-            return _usersDomain.Delete(id);
+            return _planningDomain.Delete(id);
         }
 
         #region IDisposable Support
         protected override void Dispose(bool disposing)
         {
-            _usersDomain.Dispose();
+            _planningDomain.Dispose();
             base.Dispose(disposing);
         }
         #endregion

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using shaker.crosscutting.Exceptions;
 using shaker.data;
 using shaker.data.entity.Movements;
@@ -100,22 +99,22 @@ namespace shaker.domain.Movements
 
         public IEnumerable<MovementDto> GetAll()
         {
-            return _uow.Movements.GetAll(ToMovementDtoSb());
+            return _uow.Movements.GetAll(m => ToMovementDto(m));
         }
 
         public IEnumerable<MovementDto> GetAllOfType(string typeId)
         {
-            return _uow.Movements.GetAll(ToMovementDtoSb(), m => m.MovementType.Id == typeId);
+            return _uow.Movements.GetAll(m => ToMovementDto(m), m => m.MovementType.Id == typeId);
         }
 
         public IEnumerable<MovementDto> GetAllOfBodyZone(string bodyZoneId)
         {
-            return _uow.MovementBodyZone.GetAll(BodyZoneToMovementDtoSb(), m => m.BodyZone.Id == bodyZoneId);
+            return _uow.MovementBodyZones.GetAll(mb => ToMovementDto(mb.Movement), m => m.BodyZone.Id == bodyZoneId);
         }
 
         public IEnumerable<MovementDto> GetAllOfBodyPart(string bodyPartId)
         {
-            return _uow.MovementBodyPart.GetAll(BodyPartToMovementDtoSb(), m => m.BodyPart.Id == bodyPartId);
+            return _uow.MovementBodyParts.GetAll(mb => ToMovementDto(mb.Movement), m => m.BodyPart.Id == bodyPartId);
         }
 
         public static BodyPartDto ToBodyPartDto(BodyPart entity)
@@ -160,42 +159,6 @@ namespace shaker.domain.Movements
                 Name = entity.Name,
                 Description = entity.Description,
                 ImgPath = entity.ImgPath
-            };
-        }
-
-        public static Expression<Func<Movement, MovementDto>> ToMovementDtoSb()
-        {
-            return m => new MovementDto
-            {
-                Id = m.Id,
-                Description = m.Description,
-                ImgPath = m.ImgPath,
-                Name = m.Name,
-                MovementType = ToMovementTypeDto(m.MovementType)
-            };
-        }
-
-        public static Expression<Func<MovementBodyZone, MovementDto>> BodyZoneToMovementDtoSb()
-        {
-            return mb => new MovementDto
-            {
-                Id = mb.Movement.Id,
-                Description = mb.Movement.Description,
-                ImgPath = mb.Movement.ImgPath,
-                Name = mb.Movement.Name,
-                MovementType = ToMovementTypeDto(mb.Movement.MovementType)
-            };
-        }
-
-        public static Expression<Func<MovementBodyPart, MovementDto>> BodyPartToMovementDtoSb()
-        {
-            return mb => new MovementDto
-            {
-                Id = mb.Movement.Id,
-                Description = mb.Movement.Description,
-                ImgPath = mb.Movement.ImgPath,
-                Name = mb.Movement.Name,
-                MovementType = ToMovementTypeDto(mb.Movement.MovementType)
             };
         }
 

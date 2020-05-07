@@ -17,17 +17,20 @@ namespace shaker.data.core
 
         bool Remove(TEntity entity);
 
-        TEntity Find(string id);
+        TEntity Find(string id, params Expression<Func<TEntity, IBaseEntity>>[] includes);
 
-        IEnumerable<TEntity> AsEnumerable();
+        IEnumerable<TEntity> AsEnumerable(params Expression<Func<TEntity, IBaseEntity>>[] includes);
 
-        IEnumerable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selectBuilder)
+        IEnumerable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selectBuilder,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes)
             where TResult : IBaseEntity;
 
-        IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> predicate);
+        IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes);
 
         IEnumerable<TResult> Where<TResult>(Expression<Func<TEntity, TResult>> selectBuilder,
-            Expression<Func<TEntity, bool>> predicate)
+            Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, IBaseEntity>>[] includes)
             where TResult : IBaseEntity;
     }
 }
