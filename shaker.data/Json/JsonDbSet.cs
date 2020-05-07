@@ -46,25 +46,27 @@ namespace shaker.data.Json
 
         public TEntity Find(string id, params Expression<Func<TEntity, IBaseEntity>>[] includes)
         {
-            return Includes(_collection, includes).FindById(id);
+            if (includes == null) return _collection.FindById(id);
+
+            return Includes(_collection, includes).Where(x => x.Id == id).SingleOrDefault();
         }
 
         public IEnumerable<TEntity> AsEnumerable(params Expression<Func<TEntity, IBaseEntity>>[] includes)
         {
-            return Includes(_collection, includes).Query().ToEnumerable();
+            return Includes(_collection, includes).ToEnumerable();
         }
 
         public IEnumerable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selectBuilder,
             params Expression<Func<TEntity, IBaseEntity>>[] includes)
             where TResult : IBaseEntity
         {
-            return Includes(_collection, includes).Query().Select(selectBuilder).ToEnumerable();
+            return Includes(_collection, includes).Select(selectBuilder).ToEnumerable();
         }
 
         public IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> predicate,
             params Expression<Func<TEntity, IBaseEntity>>[] includes)
         {
-            return Includes(_collection, includes).Query().Where(predicate).ToEnumerable();
+            return Includes(_collection, includes).Where(predicate).ToEnumerable();
         }
 
         public IEnumerable<TResult> Where<TResult>(Expression<Func<TEntity, TResult>> selectBuilder,
@@ -72,20 +74,22 @@ namespace shaker.data.Json
             params Expression<Func<TEntity, IBaseEntity>>[] includes)
             where TResult : IBaseEntity
         {
-            return Includes(_collection, includes).Query().Where(predicate).Select(selectBuilder).ToEnumerable();
+            return Includes(_collection, includes).Where(predicate).Select(selectBuilder).ToEnumerable();
         }
 
-        private ILiteCollection<TEntity> Includes(ILiteCollection<TEntity> collection,
+        private ILiteQueryable<TEntity> Includes(ILiteCollection<TEntity> collection,
             params Expression<Func<TEntity, IBaseEntity>>[] includes)
         {
-            if (includes == null) return collection;
+            if (includes == null) return collection.Query();
 
-            foreach(Expression<Func<TEntity, IBaseEntity>> include in includes)
+            ILiteQueryable<TEntity> queryable = collection.Query();
+
+            foreach (Expression<Func<TEntity, IBaseEntity>> include in includes)
             {
-                collection = collection.Include(include);
+                queryable = queryable.Include(include);
             }
 
-            return collection;
+            return queryable;
         }
     }
 }

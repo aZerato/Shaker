@@ -14,6 +14,8 @@ namespace shaker.domain.Planning
 
         CalendarEventDto Get(string eventId);
 
+        IEnumerable<CalendarEventDto> GetAllOfTheMonth();
+
         IEnumerable<CalendarEventDto> GetAll(DateTime from, DateTime? to, string eventTypeId);
 
         IEnumerable<CalendarEventTypeDto> GetAllType();

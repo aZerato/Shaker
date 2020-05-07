@@ -28,8 +28,7 @@ namespace shaker.Areas.Api.Controllers
         [HttpGet]
         public IEnumerable<CalendarEventDto> Get()
         {
-            //method events of the current month
-            return new List<CalendarEventDto>();
+            return _planningDomain.GetAllOfTheMonth();
         }
 
         [HttpGet]
