@@ -64,7 +64,9 @@ namespace shaker.domain.Planning
 
         public CalendarEventDto Get(string id)
         {
-            CalendarEvent entity = _uow.CalendarEvents.Get(id, x => x.Type);
+            CalendarEvent entity = _uow.CalendarEvents.Get(
+                p => p.Id == id && p.User.Id == _connectedUserAccessor.GetId(),
+                i => i.Type);
 
             if (entity == null)
                 throw new ShakerDomainException("No entry in DB");
@@ -74,7 +76,8 @@ namespace shaker.domain.Planning
 
         public bool Delete(string id)
         {
-            CalendarEvent entity = _uow.CalendarEvents.Get(id);
+            CalendarEvent entity = _uow.CalendarEvents.Get(
+                x => x.Id == id && x.User.Id == _connectedUserAccessor.GetId());
 
             if (entity == null)
                 throw new ShakerDomainException("No entry in DB");
@@ -92,11 +95,11 @@ namespace shaker.domain.Planning
             IEnumerable<CalendarEventDto> calendarEvents =
                 _uow.CalendarEvents.GetAll(
                     ToCalendarEventDtoSb(),
-                    x => x.Start >= from,
-                    x => x.Type);
+                    p => p.User.Id == _connectedUserAccessor.GetId() && p.Start >= from,
+                    i => i.Type);
 
             if (to.HasValue)
-                calendarEvents = calendarEvents.Where(c => c.End <= to);
+                calendarEvents = calendarEvents.Where(c => c.End <= to || c.End == null);
 
             if (!string.IsNullOrEmpty(eventTypeId))
                 calendarEvents = calendarEvents.Where(c => c.Type.Id == eventTypeId);
