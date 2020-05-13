@@ -9,7 +9,7 @@ using System;
 
 namespace shaker.Areas.Api.Controllers
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     public class PlanningController : Controller
     {
