@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using shaker.crosscutting.Exceptions;
 using shaker.data;
 using shaker.data.entity.Movements;
@@ -22,10 +23,31 @@ namespace shaker.domain.Movements
             entity.Name = dto.Name;
             entity.Description = dto.Description;
             entity.ImgPath = dto.ImgPath;
-            entity.MovementType = new MovementType() { Id = dto.MovementType.Id };
+            // TODO entity.MovementType = new MovementType() { Id = dto.MovementType.Id };
 
             string id = _uow.Movements.Add(entity);
             if (string.IsNullOrEmpty(id))
+                _uow.RollbackChanges();
+            else
+                _uow.Commit();
+
+            return ToMovementDto(entity);
+        }
+
+        public MovementDto Update(string id, MovementDto dto)
+        {
+            Movement entity = _uow.Movements.Get(id);
+
+            if (entity == null)
+                throw new ShakerDomainException("Not found"); // TODO
+
+            entity.Name = dto.Name;
+            entity.Description = dto.Description;
+            entity.ImgPath = dto.ImgPath;
+            // TODO entity.MovementType = new MovementType() { Id = dto.MovementType.Id };
+
+            bool state = _uow.Movements.Update(entity);
+            if (!state)
                 _uow.RollbackChanges();
             else
                 _uow.Commit();
@@ -97,9 +119,21 @@ namespace shaker.domain.Movements
             return state;
         }
 
+        public MovementDto Get(string id)
+        {
+            Movement entity = _uow.Movements.Get(id);
+
+            return ToMovementDto(entity);
+        }
+
         public IEnumerable<MovementDto> GetAll()
         {
-            return _uow.Movements.GetAll(m => ToMovementDto(m));
+            return _uow.Movements.GetAll(ToMovementDtoSb());
+        }
+
+        public IEnumerable<MovementTypeDto> GetAllTypes()
+        {
+            return _uow.MovementTypes.GetAll(ToMovementTypeDtoSb());
         }
 
         public IEnumerable<MovementDto> GetAllOfType(string typeId)
@@ -112,14 +146,35 @@ namespace shaker.domain.Movements
             return _uow.MovementBodyZones.GetAll(mb => ToMovementDto(mb.Movement), m => m.BodyZone.Id == bodyZoneId);
         }
 
+        public IEnumerable<BodyZoneDto> GetAllBodyZones()
+        {
+            return _uow.BodyZones.GetAll(ToBodyZoneDtoSb());
+        }
+
         public IEnumerable<MovementDto> GetAllOfBodyPart(string bodyPartId)
         {
             return _uow.MovementBodyParts.GetAll(mb => ToMovementDto(mb.Movement), m => m.BodyPart.Id == bodyPartId);
         }
 
+        public IEnumerable<BodyPartDto> GetAllBodyParts()
+        {
+            return _uow.BodyParts.GetAll(ToBodyPartDtoSb());
+        }
+
         public static BodyPartDto ToBodyPartDto(BodyPart entity)
         {
             return new BodyPartDto
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                Description = entity.Description,
+                ImgPath = entity.ImgPath
+            };
+        }
+
+        public static Expression<Func<BodyPart, BodyPartDto>>  ToBodyPartDtoSb()
+        {
+            return entity => new BodyPartDto
             {
                 Id = entity.Id,
                 Name = entity.Name,
@@ -139,6 +194,29 @@ namespace shaker.domain.Movements
             };
         }
 
+        public static Expression<Func<BodyZone, BodyZoneDto>> ToBodyZoneDtoSb()
+        {
+            return entity => new BodyZoneDto
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                Description = entity.Description,
+                ImgPath = entity.ImgPath
+            };
+        }
+
+        public static Expression<Func<Movement, MovementDto>> ToMovementDtoSb()
+        {
+            return entity => new MovementDto
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                Description = entity.Description,
+                ImgPath = entity.ImgPath,
+                // TODO MovementType = entity.MovementType => ToMovementTypeDtoSb()
+            };
+        }
+
         public static MovementDto ToMovementDto(Movement entity)
         {
             return new MovementDto
@@ -147,7 +225,18 @@ namespace shaker.domain.Movements
                 Name = entity.Name,
                 Description = entity.Description,
                 ImgPath = entity.ImgPath,
-                MovementType = ToMovementTypeDto(entity.MovementType)
+                MovementType = entity.MovementType == null ? null : ToMovementTypeDto(entity.MovementType)
+            };
+        }
+
+        public static Expression<Func<MovementType, MovementTypeDto>> ToMovementTypeDtoSb()
+        {
+            return entity => new MovementTypeDto
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                Description = entity.Description,
+                ImgPath = entity.ImgPath
             };
         }
 

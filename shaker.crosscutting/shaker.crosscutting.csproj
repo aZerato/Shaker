@@ -10,5 +10,6 @@
     <Folder Include="Messages\" />
     <Folder Include="Configuration\" />
     <Folder Include="Utils\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
 </Project>

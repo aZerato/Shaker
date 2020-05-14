@@ -8,6 +8,7 @@ using shaker.data;
 using shaker.data.entity.Planning;
 using shaker.data.entity.Users;
 using shaker.domain.dto.Planning;
+using shaker.crosscutting.Extensions;
 
 namespace shaker.domain.Planning
 {
@@ -63,7 +64,9 @@ namespace shaker.domain.Planning
 
         public CalendarEventDto Get(string id)
         {
-            CalendarEvent entity = _uow.CalendarEvents.Get(id, x => x.Type);
+            CalendarEvent entity = _uow.CalendarEvents.Get(
+                p => p.Id == id && p.User.Id == _connectedUserAccessor.GetId(),
+                i => i.Type);
 
             if (entity == null)
                 throw new ShakerDomainException("No entry in DB");
@@ -73,7 +76,8 @@ namespace shaker.domain.Planning
 
         public bool Delete(string id)
         {
-            CalendarEvent entity = _uow.CalendarEvents.Get(id);
+            CalendarEvent entity = _uow.CalendarEvents.Get(
+                x => x.Id == id && x.User.Id == _connectedUserAccessor.GetId());
 
             if (entity == null)
                 throw new ShakerDomainException("No entry in DB");
@@ -81,15 +85,24 @@ namespace shaker.domain.Planning
             return _uow.CalendarEvents.Remove(entity);
         }
 
-        public IEnumerable<CalendarEventDto> GetAll(DateTime from, DateTime? to, string eventTypeId)
+        public IEnumerable<CalendarEventDto> GetAllOfTheMonth()
         {
-            IEnumerable<CalendarEventDto> calendarEvents = _uow.CalendarEvents.GetAll(ToCalendarEventDtoSb());
+            return GetAll(DateTime.Now.FirstDayOfMonth(), DateTime.Now.LastDayOfMonth(), null);
+        }
+
+        public IEnumerable<CalendarEventDto> GetAll(DateTime from, DateTime? to, string eventTypeId = null)
+        {
+            IEnumerable<CalendarEventDto> calendarEvents =
+                _uow.CalendarEvents.GetAll(
+                    ToCalendarEventDtoSb(),
+                    p => p.User.Id == _connectedUserAccessor.GetId() && p.Start >= from,
+                    i => i.Type);
 
             if (to.HasValue)
-                calendarEvents.Where(c => c.Start >= from);
+                calendarEvents = calendarEvents.Where(c => c.End <= to || c.End == null);
 
             if (!string.IsNullOrEmpty(eventTypeId))
-                calendarEvents.Where(c => c.Type.Id == eventTypeId);
+                calendarEvents = calendarEvents.Where(c => c.Type.Id == eventTypeId);
 
             return calendarEvents;
         }

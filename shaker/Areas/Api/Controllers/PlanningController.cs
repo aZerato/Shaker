@@ -9,7 +9,7 @@ using System;
 
 namespace shaker.Areas.Api.Controllers
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     public class PlanningController : Controller
     {
@@ -28,8 +28,7 @@ namespace shaker.Areas.Api.Controllers
         [HttpGet]
         public IEnumerable<CalendarEventDto> Get()
         {
-            //method events of the current month
-            return new List<CalendarEventDto>();
+            return _planningDomain.GetAllOfTheMonth();
         }
 
         [HttpGet]

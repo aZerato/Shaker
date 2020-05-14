@@ -8,17 +8,27 @@ namespace shaker.domain.Movements
     {
         MovementDto Create(MovementDto dto);
 
+        MovementDto Update(string id, MovementDto dto);
+
         BodyPartDto Create(BodyPartDto dto);
 
         BodyZoneDto Create(BodyZoneDto dto);
 
         bool Delete(string id);
 
+        MovementDto Get(string id);
+
         IEnumerable<MovementDto> GetAll();
+
+        IEnumerable<MovementTypeDto> GetAllTypes();
 
         IEnumerable<MovementDto> GetAllOfType(string typeId);
 
+        IEnumerable<BodyZoneDto> GetAllBodyZones();
+
         IEnumerable<MovementDto> GetAllOfBodyZone(string zoneId);
+
+        IEnumerable<BodyPartDto> GetAllBodyParts();
 
         IEnumerable<MovementDto> GetAllOfBodyPart(string partId);
     }

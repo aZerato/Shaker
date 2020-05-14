@@ -33,26 +33,35 @@ namespace shaker.Areas.Hubs
 
             messageJson = JsonConvert.SerializeObject(dto);
 
-            await Clients.All.SendAsync("BroadcastMessage", messageJson);
+            await Clients.Group(dto.ChannelId).SendAsync("BroadcastMessage", messageJson);
         }
 
-        public async Task RegisterConnection()
+        public Task JoinChannel(string channelId)
+        {
+            return Groups.AddToGroupAsync(Context.ConnectionId, channelId);
+        }
+
+        public Task LeaveChannel(string channelId)
+        {
+            return Groups.RemoveFromGroupAsync(Context.ConnectionId, channelId);
+        }
+
+        public async Task ConnectionRegistered()
         {   
-            await Clients.All.SendAsync("RegisterConnection", _connectedUserAccessor.GetId());
+            await Clients.Caller.SendAsync("ConnectionRegistered", Context.ConnectionId);
         }
 
         public override async Task OnConnectedAsync()
         {
-            await Clients.All.SendAsync("UserConnected", Context.ConnectionId);
+            await Clients.All.SendAsync("UserConnected", _connectedUserAccessor.GetId());
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception ex)
         {
-            await Clients.All.SendAsync("UserDisconnected", Context.ConnectionId);
+            await Clients.All.SendAsync("UserDisconnected", _connectedUserAccessor.GetId());
             await base.OnDisconnectedAsync(ex);
         }
-
 
         #region IDisposable Support
         protected override void Dispose(bool disposing)
