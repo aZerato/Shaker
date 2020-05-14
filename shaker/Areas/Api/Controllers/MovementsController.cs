@@ -59,9 +59,9 @@ namespace shaker.Areas.Api.Controllers
 
 
         [HttpPut("{id}")]
-        public void Put(string id, [FromBody]MovementDto value)
+        public MovementDto Put(string id, [FromBody]MovementDto value)
         {
-            _movementsDomain.Update(id, value);
+            return _movementsDomain.Update(id, value);
         }
 
         [HttpDelete("{id}")]
